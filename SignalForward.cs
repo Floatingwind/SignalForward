@@ -40,12 +40,14 @@ namespace SignalForward
         /// <summary>
         /// 通讯信号
         /// </summary>
-        public WHCurrentQueue<Byte[]>? RemoteQueue;
+        public WHCurrentQueue<byte[]>? RemoteQueue;
 
+        public List<byte[]> Aoi1Message = new List<byte[]>();
+        public List<byte[]> Aoi2Message = new List<byte[]>();
         public SignalForward()
         {
             log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-            RemoteQueue = new WHCurrentQueue<Byte[]>("", log);
+            RemoteQueue = new WHCurrentQueue<byte[]>("", log);
             InitializeComponent();
             Task.Factory.StartNew(Communication, TaskCreationOptions.LongRunning);
         }
@@ -154,7 +156,26 @@ namespace SignalForward
             _remoteUdp = new xxUDPSyncServer(IPAddress.Parse(Plc_oneIp.Text.Trim()), int.Parse(Plc_onePort.Text.Trim()), log);
             _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
             {
-                RemoteQueue.Enqueue(dataBytes);
+                
+                if (_localUdp != null || _localUdp1 != null)
+                {
+                    switch (dataBytes[43])
+                    {
+                        case 1 :
+                            _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
+                            break;
+                        case 2 :
+                            _localUdp1.Send(_Aoi2PortEndPoint,dataBytes);
+                            break;
+                        case 3 :
+                            _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
+                            _localUdp1.Send(_Aoi2PortEndPoint,dataBytes);
+                            break;
+                        default:
+                            break;
+                    }
+                    RemoteQueue.Enqueue(dataBytes);
+                }
             };
             _remoteUdp.Start();
         }
@@ -164,12 +185,43 @@ namespace SignalForward
         {
             _Aoi1PortEndPoint = new IPEndPoint(IPAddress.Parse(Aoi1Ip.Text.Trim()), int.Parse(Aoi1Port.Text.Trim()));
             _localUdp = new xxUDPSyncServer(IPAddress.Parse(Aoi1_oneIp.Text.Trim()), int.Parse(Aoi_onePort.Text.Trim()), log);
+            _localUdp.DataReceived += (o, bytes) =>
+            {
+                lock (this)
+                {
+                    Aoi1Message.Add(bytes);
+                }
+            };
         }
 
         private void button2_Click_1(object sender, EventArgs e)
         {
             _Aoi2PortEndPoint = new IPEndPoint(IPAddress.Parse(Aoi2Ip.Text.Trim()), int.Parse(Aoi2Port.Text.Trim()));
             _localUdp1 = new xxUDPSyncServer(IPAddress.Parse(Aoi2_oneIp.Text.Trim()), int.Parse(Aoi2_onePort.Text.Trim()), log);
+            _localUdp1.DataReceived += (o, bytes) =>
+            {
+                lock (this)
+                {
+                    Aoi2Message.Add(bytes);
+                }
+            };
         }
+
+        private void Transmit()
+        {
+            while (true)
+            {
+                byte[] value = default;
+                RemoteQueue.Dequeue(out value);
+                
+                //准备拍照
+                
+                //拍照中
+                
+                //完成拍照
+            }
+        }
+
+
     }
 }
