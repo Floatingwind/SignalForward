@@ -64,6 +64,9 @@
             this.Aoi2_onePort = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.Aoi2_oneIp = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -71,6 +74,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.plc);
             this.groupBox1.Controls.Add(this.label11);
@@ -194,6 +198,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.button4);
             this.groupBox2.Controls.Add(this.button1);
             this.groupBox2.Controls.Add(this.label13);
             this.groupBox2.Controls.Add(this.label9);
@@ -317,6 +322,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.button5);
             this.groupBox3.Controls.Add(this.button2);
             this.groupBox3.Controls.Add(this.label17);
             this.groupBox3.Controls.Add(this.label16);
@@ -438,6 +444,42 @@
             this.Aoi2_oneIp.TabIndex = 0;
             this.Aoi2_oneIp.Text = "127.0.0.1";
             // 
+            // button3
+            // 
+            this.button3.Enabled = false;
+            this.button3.Location = new System.Drawing.Point(447, 29);
+            this.button3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(73, 38);
+            this.button3.TabIndex = 11;
+            this.button3.Text = "关闭";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // button4
+            // 
+            this.button4.Enabled = false;
+            this.button4.Location = new System.Drawing.Point(447, 32);
+            this.button4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(73, 38);
+            this.button4.TabIndex = 12;
+            this.button4.Text = "关闭";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // button5
+            // 
+            this.button5.Enabled = false;
+            this.button5.Location = new System.Drawing.Point(445, 33);
+            this.button5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(73, 38);
+            this.button5.TabIndex = 13;
+            this.button5.Text = "关闭";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // SignalForward
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -497,5 +539,8 @@
         private TextBox Aoi2Ip;
         private Button button1;
         private Button button2;
+        private Button button3;
+        private Button button4;
+        private Button button5;
     }
 }

@@ -57,6 +57,21 @@ namespace SignalForward
             RemoteQueue = new WHCurrentQueue<byte[]>("等待发送结果", log);
             RemoveQueue = new WHCurrentQueue<byte[]>("等待删除结果", log);
             InitializeComponent();
+            PlcIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            PlcPort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            Plc_oneIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            Plc_onePort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+
+            Aoi1_oneIp.DataBindings.Add("Enabled", button1, "Enabled");
+            Aoi_onePort.DataBindings.Add("Enabled", button1, "Enabled");
+            Aoi1Ip.DataBindings.Add("Enabled", button1, "Enabled");
+            Aoi1Port.DataBindings.Add("Enabled", button1, "Enabled");
+
+            Aoi2_oneIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            Aoi2_onePort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            Aoi2Ip.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            Aoi2Port.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+
             Task.Factory.StartNew(Transmit, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(Remove, TaskCreationOptions.LongRunning);
         }
@@ -163,67 +178,131 @@ namespace SignalForward
 
         private void RemoteBnt_Click_1(object sender, EventArgs e)
         {
-            _plcIpEndPoint = new IPEndPoint(IPAddress.Parse(PlcIp.Text.Trim()), int.Parse(PlcPort.Text.Trim()));
-
-            _remoteUdp = new xxUDPSyncServer(IPAddress.Parse(Plc_oneIp.Text.Trim()), int.Parse(Plc_onePort.Text.Trim()), log);
-            _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
+            try
             {
-                //byte[] destination = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                RemoteBnt.Enabled = false;
+                button3.Enabled = true;
+                _plcIpEndPoint = new IPEndPoint(IPAddress.Parse(PlcIp.Text.Trim()), int.Parse(PlcPort.Text.Trim()));
 
-                //var b = destination.SequenceEqual(a);
-                if (_localUdp != null || _localUdp1 != null)
+                _remoteUdp = new xxUDPSyncServer(IPAddress.Parse(Plc_oneIp.Text.Trim()), int.Parse(Plc_onePort.Text.Trim()), log);
+                _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
                 {
-                    switch (dataBytes[43])
+                    //byte[] destination = dataBytes.Skip(34).Take(44 - 34).ToArray();
+
+                    //var b = destination.SequenceEqual(a);
+                    if (_localUdp != null || _localUdp1 != null)
                     {
-                        case 1:
-                            _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
-                            break;
+                        switch (dataBytes[43])
+                        {
+                            case 1:
+                                if (dataBytes[3] == 1)
+                                {
+                                    _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
+                                }
+                                break;
 
-                        case 2:
-                            _localUdp1.Send(_Aoi2PortEndPoint, dataBytes);
-                            break;
+                            case 2:
+                                if (dataBytes[3] == 1)
+                                {
+                                    _localUdp1.Send(_Aoi2PortEndPoint, dataBytes);
+                                }
+                                break;
 
-                        case 3:
-                            _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
-                            _localUdp1.Send(_Aoi2PortEndPoint, dataBytes);
-                            break;
+                            case 3:
+                                if (dataBytes[3] == 1)
+                                {
+                                    _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
+                                    _localUdp1.Send(_Aoi2PortEndPoint, dataBytes);
+                                }
+                                break;
 
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
+                        RemoteQueue.Enqueue(dataBytes);
                     }
-                    RemoteQueue.Enqueue(dataBytes);
+                };
+                _remoteUdp.Start();
+            }
+            catch (Exception exception)
+            {
+                RemoteBnt.Enabled = true;
+                button3.Enabled = false;
+                if (_remoteUdp != null)
+                {
+                    _remoteUdp.Stop();
+                    _remoteUdp.Dispose();
+                    _remoteUdp = null;
                 }
-            };
-            _remoteUdp.Start();
+
+            }
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            _Aoi1PortEndPoint = new IPEndPoint(IPAddress.Parse(Aoi1Ip.Text.Trim()), int.Parse(Aoi1Port.Text.Trim()));
-            _localUdp = new xxUDPSyncServer(IPAddress.Parse(Aoi1_oneIp.Text.Trim()), int.Parse(Aoi_onePort.Text.Trim()), log);
-            _localUdp.DataReceived += (o, bytes) =>
+            try
             {
-                lock (this)
+                button1.Enabled = false;
+                button4.Enabled = true;
+                _Aoi1PortEndPoint =
+                    new IPEndPoint(IPAddress.Parse(Aoi1Ip.Text.Trim()), int.Parse(Aoi1Port.Text.Trim()));
+                _localUdp = new xxUDPSyncServer(IPAddress.Parse(Aoi1_oneIp.Text.Trim()),
+                    int.Parse(Aoi_onePort.Text.Trim()), log);
+                _localUdp.DataReceived += (o, bytes) =>
                 {
-                    Aoi1Message.Add(bytes);
+                    lock (this)
+                    {
+                        Aoi1Message.Add(bytes);
+                    }
+                };
+                _localUdp.Start();
+            }
+            catch (Exception exception)
+            {
+                button1.Enabled = true;
+                button4.Enabled = false;
+                if (_localUdp != null)
+                {
+                    _localUdp.Stop();
+                    _localUdp.Dispose();
+                    _localUdp = null;
                 }
-            };
-            _localUdp.Start();
+            }
         }
 
         private void button2_Click_1(object sender, EventArgs e)
         {
-            _Aoi2PortEndPoint = new IPEndPoint(IPAddress.Parse(Aoi2Ip.Text.Trim()), int.Parse(Aoi2Port.Text.Trim()));
-            _localUdp1 = new xxUDPSyncServer(IPAddress.Parse(Aoi2_oneIp.Text.Trim()), int.Parse(Aoi2_onePort.Text.Trim()), log);
-            _localUdp1.DataReceived += (o, bytes) =>
+            try
             {
-                lock (this)
+                button2.Enabled = false;
+                button5.Enabled = true;
+                _Aoi2PortEndPoint =
+                    new IPEndPoint(IPAddress.Parse(Aoi2Ip.Text.Trim()), int.Parse(Aoi2Port.Text.Trim()));
+                _localUdp1 = new xxUDPSyncServer(IPAddress.Parse(Aoi2_oneIp.Text.Trim()),
+                    int.Parse(Aoi2_onePort.Text.Trim()), log);
+                _localUdp1.DataReceived += (o, bytes) =>
                 {
-                    Aoi2Message.Add(bytes);
+                    lock (this)
+                    {
+                        Aoi2Message.Add(bytes);
+                    }
+                };
+                _localUdp1.Start();
+            }
+            catch (Exception exception)
+            {
+                button2.Enabled = true;
+                button5.Enabled = false;
+                if (_localUdp1 != null)
+                {
+                    _localUdp.Stop();
+                    _localUdp.Dispose();
+                    _localUdp = null;
                 }
-            };
-            _localUdp1.Start();
+            }
         }
+
 
         private void Transmit()
         {
@@ -240,201 +319,206 @@ namespace SignalForward
                 //收到的消息
                 byte[] value = default;
                 RemoteQueue.Dequeue(out value);
-                log.Info(value);
-                switch (value[43])
+                try
                 {
-                    case 1:
-                        byte[] destination1 = value.Skip(34).Take(35 - 34).ToArray();
-                        timeOut = 0;
-                        beforeDT = System.DateTime.Now;
-                        while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
-                        {
-
-                            lock (this)
+                    log.Info(value);
+                    switch (value[66])
+                    {
+                        case 1:
+                            byte[] destination1 = value.Skip(34).Take(44 - 34).ToArray();
+                            timeOut = 0;
+                            beforeDT = System.DateTime.Now;
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
                             {
-                                //拍照中
-                                var a = Aoi1Message.Find(item =>
-                                       item[2] == 0 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination1)
-                                   );
-                                if (a != null)
+                                lock (this)
                                 {
-                                    byte[] re = new byte[a.Length];
-                                    Array.Copy(a, re, a.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    inPhoto = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
-                                }
+                                    //拍照中
+                                    var a = Aoi1Message.Find(item =>
+                                           item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination1)
+                                       );
+                                    if (a != null)
+                                    {
+                                        byte[] re = new byte[a.Length];
+                                        Array.Copy(a, re, a.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        inPhoto = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                    }
 
-                                //拍照完成
-                                var b = Aoi1Message.Find(item =>
-                                       item[2] == 1 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination1)
-                                   );
-                                if (b != null)
-                                {
-                                    byte[] re = new byte[b.Length];
-                                    Array.Copy(b, re, b.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    photoCompleted = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
-                                }
+                                    //拍照完成
+                                    var b = Aoi1Message.Find(item =>
+                                           item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination1)
+                                       );
+                                    if (b != null)
+                                    {
+                                        byte[] re = new byte[b.Length];
+                                        Array.Copy(b, re, b.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        photoCompleted = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
+                                    }
 
-                                //检测完成
-                                var c = Aoi1Message.Find(item =>
-                                      item[2] == 2 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination1)
-                                  );
-                                if (c != null)
-                                {
-                                    byte[] re = new byte[c.Length];
-                                    Array.Copy(c, re, c.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    complete = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
+                                    //检测完成
+                                    var c = Aoi1Message.Find(item =>
+                                          item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination1)
+                                      );
+                                    if (c != null)
+                                    {
+                                        byte[] re = new byte[c.Length];
+                                        Array.Copy(c, re, c.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        complete = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
+                                    }
+                                    DateTime afterDT = System.DateTime.Now;
+                                    TimeSpan ts = afterDT.Subtract(beforeDT);
+                                    timeOut = ts.Milliseconds;
                                 }
-                                DateTime afterDT = System.DateTime.Now;
-                                TimeSpan ts = afterDT.Subtract(beforeDT);
-                                timeOut = ts.Milliseconds;
                             }
+                            RemoveQueue.Enqueue(value);
+                            break;
 
-                        }
-                        RemoveQueue.Enqueue(value);
-                        break;
-
-                    case 2:
-                        byte[] destination2 = value.Skip(35).Take(36 - 35).ToArray();
-                        timeOut = 0;
-                        beforeDT = System.DateTime.Now;
-                        while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
-                        {
-                            lock (this)
+                        case 2:
+                            byte[] destination2 = value.Skip(44).Take(54 - 44).ToArray();
+                            timeOut = 0;
+                            beforeDT = System.DateTime.Now;
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
                             {
-                                //拍照中
-                                var a = Aoi2Message.Find(item =>
-                                    item[2] == 0 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination2)
-                                );
-                                if (a != null)
+                                lock (this)
                                 {
-                                    byte[] re = new byte[a.Length];
-                                    Array.Copy(a, re, a.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    inPhoto = false;
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
-                                }
+                                    //拍照中
+                                    var a = Aoi2Message.Find(item =>
+                                        item[2] == 0 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination2)
+                                    );
+                                    if (a != null)
+                                    {
+                                        byte[] re = new byte[a.Length];
+                                        Array.Copy(a, re, a.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        inPhoto = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
+                                    }
 
-                                //拍照完成
-                                var b = Aoi2Message.Find(item =>
-                                    item[2] == 1 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination2)
-                                );
-                                if (b != null)
-                                {
-                                    byte[] re = new byte[b.Length];
-                                    Array.Copy(b, re, b.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    photoCompleted = false;
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
-                                }
+                                    //拍照完成
+                                    var b = Aoi2Message.Find(item =>
+                                        item[2] == 1 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination2)
+                                    );
+                                    if (b != null)
+                                    {
+                                        byte[] re = new byte[b.Length];
+                                        Array.Copy(b, re, b.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        photoCompleted = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
+                                    }
 
-                                //检测完成
-                                var c = Aoi2Message.Find(item =>
-                                    item[2] == 2 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination2)
-                                );
-                                if (c != null)
-                                {
-                                    byte[] re = new byte[c.Length];
-                                    Array.Copy(c, re, c.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    complete = false;
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
+                                    //检测完成
+                                    var c = Aoi2Message.Find(item =>
+                                        item[2] == 2 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination2)
+                                    );
+                                    if (c != null)
+                                    {
+                                        byte[] re = new byte[c.Length];
+                                        Array.Copy(c, re, c.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        complete = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
+                                    }
+                                    DateTime afterDT = System.DateTime.Now;
+                                    TimeSpan ts = afterDT.Subtract(beforeDT);
+                                    timeOut = ts.Milliseconds;
                                 }
-                                DateTime afterDT = System.DateTime.Now;
-                                TimeSpan ts = afterDT.Subtract(beforeDT);
-                                timeOut = ts.Milliseconds;
                             }
+                            RemoveQueue.Enqueue(value);
+                            break;
 
-                        }
-                        RemoveQueue.Enqueue(value);
-                        break;
-
-                    case 3:
-                        byte[] destination3 = value.Skip(34).Take(35 - 34).ToArray();
-                        byte[] destination4 = value.Skip(35).Take(36 - 35).ToArray();
-                        timeOut = 0;
-                        beforeDT = System.DateTime.Now;
-                        while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
-                        {
-                            lock (this)
+                        case 3:
+                            byte[] destination3 = value.Skip(34).Take(44 - 34).ToArray();
+                            byte[] destination4 = value.Skip(44).Take(54 - 44).ToArray();
+                            timeOut = 0;
+                            beforeDT = System.DateTime.Now;
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
                             {
-                                //拍照中
-                                var a = Aoi1Message.Find(item =>
-                                    item[2] == 0 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination3)
-                                );
-                                var a1 = Aoi2Message.Find(item =>
-                                    item[2] == 0 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination4)
-                                );
-                                if (a != null && a1 != null)
+                                lock (this)
                                 {
-                                    byte[] re = new byte[a.Length];
-                                    Array.Copy(a, re, a.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    inPhoto = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
-                                }
+                                    //拍照中
+                                    var a = Aoi1Message.Find(item =>
+                                        item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
+                                    );
+                                    var a1 = Aoi2Message.Find(item =>
+                                        item[2] == 0 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination4)
+                                    );
+                                    if (a != null && a1 != null)
+                                    {
+                                        byte[] re = new byte[a.Length];
+                                        Array.Copy(a, re, a.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        inPhoto = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
+                                    }
 
-                                //拍照完成
-                                var b = Aoi1Message.Find(item =>
-                                    item[2] == 1 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination3)
-                                );
-                                var b1 = Aoi2Message.Find(item =>
-                                    item[2] == 1 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination4)
-                                );
-                                if (b != null && b1 != null)
-                                {
-                                    byte[] re = new byte[b.Length];
-                                    Array.Copy(b, re, b.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    photoCompleted = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(b1));
-                                }
+                                    //拍照完成
+                                    var b = Aoi1Message.Find(item =>
+                                        item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
+                                    );
+                                    var b1 = Aoi2Message.Find(item =>
+                                        item[2] == 1 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination4)
+                                    );
+                                    if (b != null && b1 != null)
+                                    {
+                                        byte[] re = new byte[b.Length];
+                                        Array.Copy(b, re, b.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        photoCompleted = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(b1));
+                                    }
 
-                                //检测完成
-                                var c = Aoi1Message.Find(item =>
-                                    item[2] == 2 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination3)
-                                );
-                                var c1 = Aoi1Message.Find(item =>
-                                    item[2] == 2 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination4)
-                                );
-                                if (c != null && c1 != null)
-                                {
-                                    c[11] = c1[9];
-                                    c[12] = c1[10];
-                                    byte[] re = new byte[c.Length];
-                                    Array.Copy(c, re, c.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    complete = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(c1));
+                                    //检测完成
+                                    var c = Aoi1Message.Find(item =>
+                                        item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
+                                    );
+                                    var c1 = Aoi1Message.Find(item =>
+                                        item[2] == 2 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination4)
+                                    );
+                                    if (c != null && c1 != null)
+                                    {
+                                        c[11] = c1[9];
+                                        c[12] = c1[10];
+                                        byte[] re = new byte[c.Length];
+                                        Array.Copy(c, re, c.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        complete = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(c1));
+                                    }
+                                    DateTime afterDT = System.DateTime.Now;
+                                    TimeSpan ts = afterDT.Subtract(beforeDT);
+                                    timeOut = ts.Milliseconds;
                                 }
-                                DateTime afterDT = System.DateTime.Now;
-                                TimeSpan ts = afterDT.Subtract(beforeDT);
-                                timeOut = ts.Milliseconds;
                             }
+                            RemoveQueue.Enqueue(value);
+                            break;
 
-                        }
-                        RemoveQueue.Enqueue(value);
-                        break;
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
+                catch (Exception e)
+                {
+                    log.Debug(e.Message, e);
+                }
+
             }
         }
 
@@ -448,156 +532,222 @@ namespace SignalForward
                 bool clear = true;
                 bool complete = true;
                 RemoveQueue.Dequeue(out value);
-
-                switch (value[43])
+                try
                 {
-                    case 1:
-                        byte[] destination1 = value.Skip(34).Take(35 - 34).ToArray();
-                        timeOut = 0;
-                        beforeDT = System.DateTime.Now;
-                        while ((clear || complete) && timeOut < 1000)
-                        {
-
-                            lock (this)
+                    switch (value[66])
+                    {
+                        case 1:
+                            byte[] destination1 = value.Skip(34).Take(44 - 34).ToArray();
+                            timeOut = 0;
+                            beforeDT = System.DateTime.Now;
+                            while ((clear || complete) && timeOut < 1000)
                             {
-                                //发送检测清空信号
-                                var a = Aoi1Message.Find(item =>
-                                     item[1] == 0 && item[2] == 3 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination1)
-                                   );
-                                if (a != null)
+                                lock (this)
                                 {
-                                    byte[] re = new byte[a.Length];
-                                    Array.Copy(a, re, a.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    clear = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
-                                }
+                                    //发送检测清空信号
+                                    var a = Aoi1Message.Find(item =>
+                                         item[1] == 0 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination1)
+                                       );
+                                    if (a != null)
+                                    {
+                                        byte[] re = new byte[a.Length];
+                                        Array.Copy(a, re, a.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        clear = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                    }
 
-                                //发送就绪信号
-                                var b = Aoi1Message.Find(item =>
-                                        item[1] == 1 && item[2] == 3 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination1)
-                                   );
-                                if (b != null)
-                                {
-                                    byte[] re = new byte[b.Length];
-                                    Array.Copy(b, re, b.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    complete = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
-                                }
+                                    //发送就绪信号
+                                    var b = Aoi1Message.Find(item =>
+                                            item[1] == 1 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination1)
+                                       );
+                                    if (b != null)
+                                    {
+                                        byte[] re = new byte[b.Length];
+                                        Array.Copy(b, re, b.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        complete = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
+                                    }
 
-                                DateTime afterDT = System.DateTime.Now;
-                                TimeSpan ts = afterDT.Subtract(beforeDT);
-                                timeOut = ts.Milliseconds;
+                                    DateTime afterDT = System.DateTime.Now;
+                                    TimeSpan ts = afterDT.Subtract(beforeDT);
+                                    timeOut = ts.Milliseconds;
+                                }
                             }
 
-                        }
+                            break;
 
-                        break;
-
-                    case 2:
-                        byte[] destination2 = value.Skip(35).Take(36 - 35).ToArray();
-                        timeOut = 0;
-                        beforeDT = System.DateTime.Now;
-                        while ((clear || complete) && timeOut < 1000)
-                        {
-                            lock (this)
+                        case 2:
+                            byte[] destination2 = value.Skip(44).Take(54 - 44).ToArray();
+                            timeOut = 0;
+                            beforeDT = System.DateTime.Now;
+                            while ((clear || complete) && timeOut < 1000)
                             {
-                                //发送检测清空信号
-                                var a = Aoi2Message.Find(item =>
-                                    item[1] == 0 && item[2] == 3 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination2)
-                                );
-                                if (a != null)
+                                lock (this)
                                 {
-                                    byte[] re = new byte[a.Length];
-                                    Array.Copy(a, re, a.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    clear = false;
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
-                                }
+                                    //发送检测清空信号
+                                    var a = Aoi2Message.Find(item =>
+                                        item[1] == 0 && item[2] == 3 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination2)
+                                    );
+                                    if (a != null)
+                                    {
+                                        byte[] re = new byte[a.Length];
+                                        Array.Copy(a, re, a.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        clear = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
+                                    }
 
-                                //发送就绪信号
-                                var b = Aoi2Message.Find(item =>
-                                    item[1] == 1 && item[2] == 3 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination2)
-                                );
-                                if (b != null)
-                                {
-                                    byte[] re = new byte[b.Length];
-                                    Array.Copy(b, re, b.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    complete = false;
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
-                                }
+                                    //发送就绪信号
+                                    var b = Aoi2Message.Find(item =>
+                                        item[1] == 1 && item[2] == 3 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination2)
+                                    );
+                                    if (b != null)
+                                    {
+                                        byte[] re = new byte[b.Length];
+                                        Array.Copy(b, re, b.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        complete = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
+                                    }
 
-                                DateTime afterDT = System.DateTime.Now;
-                                TimeSpan ts = afterDT.Subtract(beforeDT);
-                                timeOut = ts.Milliseconds;
+                                    DateTime afterDT = System.DateTime.Now;
+                                    TimeSpan ts = afterDT.Subtract(beforeDT);
+                                    timeOut = ts.Milliseconds;
+                                }
                             }
 
-                        }
+                            break;
 
-                        break;
-
-                    case 3:
-                        byte[] destination3 = value.Skip(34).Take(35 - 34).ToArray();
-                        byte[] destination4 = value.Skip(35).Take(36 - 35).ToArray();
-                        timeOut = 0;
-                        beforeDT = System.DateTime.Now;
-                        while ((clear || complete) && timeOut < 1000)
-                        {
-                            lock (this)
+                        case 3:
+                            byte[] destination3 = value.Skip(34).Take(44 - 34).ToArray();
+                            byte[] destination4 = value.Skip(44).Take(54 - 44).ToArray();
+                            timeOut = 0;
+                            beforeDT = System.DateTime.Now;
+                            while ((clear || complete) && timeOut < 1000)
                             {
-                                //发送检测清空信号
-                                var a = Aoi1Message.Find(item =>
-                                    item[1] == 0 && item[2] == 3 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination3)
-                                );
-                                var a1 = Aoi2Message.Find(item =>
-                                    item[1] == 0 && item[2] == 3 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination4)
-                                );
-                                if (a != null && a1 != null)
+                                lock (this)
                                 {
-                                    byte[] re = new byte[a.Length];
-                                    Array.Copy(a, re, a.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    clear = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
-                                }
+                                    //发送检测清空信号
+                                    var a = Aoi1Message.Find(item =>
+                                        item[1] == 0 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
+                                    );
+                                    var a1 = Aoi2Message.Find(item =>
+                                        item[1] == 0 && item[2] == 3 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination4)
+                                    );
+                                    if (a != null && a1 != null)
+                                    {
+                                        byte[] re = new byte[a.Length];
+                                        Array.Copy(a, re, a.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        clear = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
+                                    }
 
-                                //发送就绪信号
-                                var b = Aoi1Message.Find(item =>
-                                    item[1] == 1 && item[2] == 3 && item.Skip(34).Take(35 - 34).ToArray().SequenceEqual(destination3)
-                                );
-                                var b1 = Aoi2Message.Find(item =>
-                                    item[1] == 1 && item[2] == 3 && item.Skip(35).Take(36 - 35).ToArray().SequenceEqual(destination4)
-                                );
-                                if (b != null && b1 != null)
-                                {
-                                    byte[] re = new byte[b.Length];
-                                    Array.Copy(b, re, b.Length);
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                    log.Info(re);
-                                    complete = false;
-                                    Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
-                                    Aoi2Message.RemoveAll(item => item.SequenceEqual(b1));
-                                }
+                                    //发送就绪信号
+                                    var b = Aoi1Message.Find(item =>
+                                        item[1] == 1 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
+                                    );
+                                    var b1 = Aoi2Message.Find(item =>
+                                        item[1] == 1 && item[2] == 3 && item.Skip(44).Take(54 - 44).ToArray().SequenceEqual(destination4)
+                                    );
+                                    if (b != null && b1 != null)
+                                    {
+                                        byte[] re = new byte[b.Length];
+                                        Array.Copy(b, re, b.Length);
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info(re);
+                                        complete = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(b1));
+                                    }
 
-                                DateTime afterDT = System.DateTime.Now;
-                                TimeSpan ts = afterDT.Subtract(beforeDT);
-                                timeOut = ts.Milliseconds;
+                                    DateTime afterDT = System.DateTime.Now;
+                                    TimeSpan ts = afterDT.Subtract(beforeDT);
+                                    timeOut = ts.Milliseconds;
+                                }
                             }
 
-                        }
+                            break;
 
-                        break;
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
+                catch (Exception e)
+                {
+                    log.Debug(e.Message, e);
+                }
+
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                button3.Enabled = false;
+                RemoteBnt.Enabled = true;
+                if (_remoteUdp != null)
+                {
+                    _remoteUdp.Stop();
+                    _remoteUdp.Dispose();
+                    _remoteUdp = null;
+                }
+
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                button4.Enabled = false;
+                button1.Enabled = true;
+                if (_localUdp != null)
+                {
+                    _localUdp.Stop();
+                    _localUdp.Dispose();
+                    _localUdp = null;
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                button5.Enabled = false;
+                button2.Enabled = true;
+                if (_localUdp1 != null)
+                {
+                    _localUdp1.Stop();
+                    _localUdp1.Dispose();
+                    _localUdp1 = null;
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
             }
         }
     }
