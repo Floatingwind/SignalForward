@@ -192,12 +192,13 @@ namespace SignalForward
                     //var b = destination.SequenceEqual(a);
                     if (_localUdp != null || _localUdp1 != null)
                     {
-                        switch (dataBytes[43])
+                        switch (dataBytes[66])
                         {
                             case 1:
                                 if (dataBytes[3] == 1)
                                 {
                                     _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
+                                    RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
 
@@ -205,6 +206,7 @@ namespace SignalForward
                                 if (dataBytes[3] == 1)
                                 {
                                     _localUdp1.Send(_Aoi2PortEndPoint, dataBytes);
+                                    RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
 
@@ -213,13 +215,14 @@ namespace SignalForward
                                 {
                                     _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
                                     _localUdp1.Send(_Aoi2PortEndPoint, dataBytes);
+                                    RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
 
                             default:
                                 break;
                         }
-                        RemoteQueue.Enqueue(dataBytes);
+
                     }
                 };
                 _remoteUdp.Start();
