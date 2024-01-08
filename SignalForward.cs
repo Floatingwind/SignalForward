@@ -197,7 +197,14 @@ namespace SignalForward
                             case 1:
                                 if (dataBytes[3] == 1)
                                 {
-                                    _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
+                                    byte[] newBytes = new byte[128];
+                                    newBytes[3] = 1;
+                                    var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    for (int i = 0; i < data.Length; i++)
+                                    {
+                                        newBytes[34 + i] = data[i];
+                                    }
+                                    _localUdp.Send(_Aoi1PortEndPoint, newBytes);
                                     RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
@@ -205,7 +212,14 @@ namespace SignalForward
                             case 2:
                                 if (dataBytes[3] == 1)
                                 {
-                                    _localUdp1.Send(_Aoi2PortEndPoint, dataBytes);
+                                    byte[] newBytes = new byte[128];
+                                    newBytes[3] = 1;
+                                   var data = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                   for (int i = 0; i < data.Length; i++)
+                                   {
+                                       newBytes[34 + i] = data[i];
+                                   }
+                                    _localUdp1.Send(_Aoi2PortEndPoint, newBytes);
                                     RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
@@ -213,8 +227,22 @@ namespace SignalForward
                             case 3:
                                 if (dataBytes[3] == 1)
                                 {
-                                    _localUdp.Send(_Aoi1PortEndPoint, dataBytes);
-                                    _localUdp1.Send(_Aoi2PortEndPoint, dataBytes);
+                                    byte[] newBytes = new byte[128];
+                                    newBytes[3] = 1;
+                                    var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    for (int i = 0; i < data.Length; i++)
+                                    {
+                                        newBytes[34 + i] = data[i];
+                                    }
+                                    byte[] newBytes1 = new byte[128];
+                                    newBytes1[3] = 1;
+                                    var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                    for (int i = 0; i < data1.Length; i++)
+                                    {
+                                        newBytes1[34 + i] = data1[i];
+                                    }
+                                    _localUdp.Send(_Aoi1PortEndPoint, newBytes);
+                                    _localUdp1.Send(_Aoi2PortEndPoint, newBytes1);
                                     RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
@@ -341,8 +369,11 @@ namespace SignalForward
                                        );
                                     if (a != null)
                                     {
-                                        byte[] re = new byte[a.Length];
-                                        Array.Copy(a, re, a.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 0;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         inPhoto = false;
@@ -355,8 +386,11 @@ namespace SignalForward
                                        );
                                     if (b != null)
                                     {
-                                        byte[] re = new byte[b.Length];
-                                        Array.Copy(b, re, b.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 1;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         photoCompleted = false;
@@ -369,8 +403,13 @@ namespace SignalForward
                                       );
                                     if (c != null)
                                     {
-                                        byte[] re = new byte[c.Length];
-                                        Array.Copy(c, re, c.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 2;
+                                        re[3] = 0;
+                                        re[9] = c[9];
+                                        re[10] = c[10];
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         complete = false;
@@ -398,8 +437,11 @@ namespace SignalForward
                                     );
                                     if (a != null)
                                     {
-                                        byte[] re = new byte[a.Length];
-                                        Array.Copy(a, re, a.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 0;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         inPhoto = false;
@@ -412,8 +454,11 @@ namespace SignalForward
                                     );
                                     if (b != null)
                                     {
-                                        byte[] re = new byte[b.Length];
-                                        Array.Copy(b, re, b.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 1;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         photoCompleted = false;
@@ -426,8 +471,13 @@ namespace SignalForward
                                     );
                                     if (c != null)
                                     {
-                                        byte[] re = new byte[c.Length];
-                                        Array.Copy(c, re, c.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 2;
+                                        re[3] = 0;
+                                        re[9] = c[9];
+                                        re[10] = c[10];
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         complete = false;
@@ -461,8 +511,11 @@ namespace SignalForward
                                     {
                                         if (a != null)
                                         {
-                                            byte[] re = new byte[a.Length];
-                                            Array.Copy(a, re, a.Length);
+                                            byte[] re = new byte[value.Length];
+                                            Array.Copy(value, re, value.Length);
+                                            re[1] = 1;
+                                            re[2] = 0;
+                                            re[3] = 0;
                                             _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                             log.Info(re);
                                             inPhoto = false;
@@ -471,8 +524,11 @@ namespace SignalForward
                                         }
                                         else if (a1 != null)
                                         {
-                                            byte[] re = new byte[a1.Length];
-                                            Array.Copy(a1, re, a1.Length);
+                                            byte[] re = new byte[value.Length];
+                                            Array.Copy(value, re, value.Length);
+                                            re[1] = 1;
+                                            re[2] = 0;
+                                            re[3] = 0;
                                             _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                             log.Info(re);
                                             inPhoto = false;
@@ -491,8 +547,11 @@ namespace SignalForward
                                     );
                                     if (b != null && b1 != null)
                                     {
-                                        byte[] re = new byte[b.Length];
-                                        Array.Copy(b, re, b.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 1;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         photoCompleted = false;
@@ -509,9 +568,13 @@ namespace SignalForward
                                     );
                                     if (c != null && c1 != null)
                                     {
-
-                                        byte[] re = new byte[c.Length];
-                                        Array.Copy(c, re, c.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 2;
+                                        re[3] = 0;
+                                        re[9] = c[9];
+                                        re[10] = c[10];
                                         re[11] = c1[9];
                                         re[12] = c1[10];
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
@@ -568,8 +631,11 @@ namespace SignalForward
                                        );
                                     if (a != null)
                                     {
-                                        byte[] re = new byte[a.Length];
-                                        Array.Copy(a, re, a.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 0;
+                                        re[2] = 3;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         clear = false;
@@ -582,8 +648,11 @@ namespace SignalForward
                                        );
                                     if (b != null)
                                     {
-                                        byte[] re = new byte[b.Length];
-                                        Array.Copy(b, re, b.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 3;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         complete = false;
@@ -612,8 +681,11 @@ namespace SignalForward
                                     );
                                     if (a != null)
                                     {
-                                        byte[] re = new byte[a.Length];
-                                        Array.Copy(a, re, a.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 0;
+                                        re[2] = 3;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         clear = false;
@@ -626,8 +698,11 @@ namespace SignalForward
                                     );
                                     if (b != null)
                                     {
-                                        byte[] re = new byte[b.Length];
-                                        Array.Copy(b, re, b.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 3;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         complete = false;
@@ -660,8 +735,11 @@ namespace SignalForward
                                     );
                                     if (a != null && a1 != null)
                                     {
-                                        byte[] re = new byte[a.Length];
-                                        Array.Copy(a, re, a.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 0;
+                                        re[2] = 3;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         clear = false;
@@ -678,8 +756,11 @@ namespace SignalForward
                                     );
                                     if (b != null && b1 != null)
                                     {
-                                        byte[] re = new byte[b.Length];
-                                        Array.Copy(b, re, b.Length);
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 3;
+                                        re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
                                         log.Info(re);
                                         complete = false;
