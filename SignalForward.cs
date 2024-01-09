@@ -48,7 +48,14 @@ namespace SignalForward
         /// </summary>
         public WHCurrentQueue<byte[]>? RemoveQueue;
 
+        /// <summary>
+        /// AOI1发送的消息
+        /// </summary>
         public List<byte[]> Aoi1Message = new();
+
+        /// <summary>
+        /// AOI2发送的消息
+        /// </summary>
         public List<byte[]> Aoi2Message = new();
 
         public SignalForward()
@@ -75,6 +82,8 @@ namespace SignalForward
             Task.Factory.StartNew(Transmit, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(Remove, TaskCreationOptions.LongRunning);
         }
+
+        #region 同步方式
 
         public void Communication()
         {
@@ -174,6 +183,8 @@ namespace SignalForward
                 }
             }
         }
+
+        #endregion 同步方式
 
         private void RemoteBnt_Click_1(object sender, EventArgs e)
         {
