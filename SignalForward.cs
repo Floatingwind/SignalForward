@@ -197,7 +197,7 @@ namespace SignalForward
                             case 1:
                                 if (dataBytes[3] == 1)
                                 {
-                                    byte[] newBytes = new byte[128];
+                                    byte[] newBytes = new byte[dataBytes.Length];
                                     newBytes[3] = 1;
                                     var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
                                     for (int i = 0; i < data.Length; i++)
@@ -212,13 +212,13 @@ namespace SignalForward
                             case 2:
                                 if (dataBytes[3] == 1)
                                 {
-                                    byte[] newBytes = new byte[128];
+                                    byte[] newBytes = new byte[dataBytes.Length];
                                     newBytes[3] = 1;
-                                   var data = dataBytes.Skip(44).Take(54 - 44).ToArray();
-                                   for (int i = 0; i < data.Length; i++)
-                                   {
-                                       newBytes[34 + i] = data[i];
-                                   }
+                                    var data = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                    for (int i = 0; i < data.Length; i++)
+                                    {
+                                        newBytes[34 + i] = data[i];
+                                    }
                                     _localUdp1.Send(_Aoi2PortEndPoint, newBytes);
                                     RemoteQueue.Enqueue(dataBytes);
                                 }
@@ -227,7 +227,7 @@ namespace SignalForward
                             case 3:
                                 if (dataBytes[3] == 1)
                                 {
-                                    byte[] newBytes = new byte[128];
+                                    byte[] newBytes = new byte[dataBytes.Length];
                                     newBytes[3] = 1;
                                     var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
                                     for (int i = 0; i < data.Length; i++)
@@ -282,9 +282,11 @@ namespace SignalForward
                     int.Parse(Aoi_onePort.Text.Trim()), log);
                 _localUdp.DataReceived += (o, bytes) =>
                 {
+                    log.Info("AOI1->O:" + bytes);
                     lock (this)
                     {
                         Aoi1Message.Add(bytes);
+
                     }
                 };
                 _localUdp.Start();
@@ -314,6 +316,7 @@ namespace SignalForward
                     int.Parse(Aoi2_onePort.Text.Trim()), log);
                 _localUdp1.DataReceived += (o, bytes) =>
                 {
+                    log.Info("AOI2->O:" + bytes);
                     lock (this)
                     {
                         Aoi2Message.Add(bytes);
@@ -375,7 +378,7 @@ namespace SignalForward
                                         re[2] = 0;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info(re);
+                                        log.Info("O->PLC" + re);
                                         inPhoto = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
@@ -392,7 +395,7 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info(re);
+                                        log.Info("O->PLC" + re);
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
@@ -411,7 +414,7 @@ namespace SignalForward
                                         re[9] = c[9];
                                         re[10] = c[10];
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info(re);
+                                        log.Info("O->PLC" + re);
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
@@ -443,7 +446,7 @@ namespace SignalForward
                                         re[2] = 0;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info(re);
+                                        log.Info("O->PLC" + re);
                                         inPhoto = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
@@ -460,7 +463,7 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info(re);
+                                        log.Info("O->PLC" + re);
                                         photoCompleted = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
@@ -517,7 +520,7 @@ namespace SignalForward
                                             re[2] = 0;
                                             re[3] = 0;
                                             _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                            log.Info(re);
+                                            log.Info("O->PLC" + re);
                                             inPhoto = false;
                                             Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                             //Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
@@ -530,7 +533,7 @@ namespace SignalForward
                                             re[2] = 0;
                                             re[3] = 0;
                                             _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                            log.Info(re);
+                                            log.Info("O->PLC" + re);
                                             inPhoto = false;
                                             //Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                             Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
@@ -578,7 +581,7 @@ namespace SignalForward
                                         re[11] = c1[9];
                                         re[12] = c1[10];
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info(re);
+                                        log.Info("O->PLC" + re);
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c1));

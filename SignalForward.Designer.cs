@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.button3 = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.plc = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -41,6 +42,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.PlcIp = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button4 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -53,6 +55,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.Aoi1_oneIp = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.button5 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.label17 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
@@ -64,9 +67,6 @@
             this.Aoi2_onePort = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.Aoi2_oneIp = new System.Windows.Forms.TextBox();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -94,6 +94,18 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "与PLC连接";
+            // 
+            // button3
+            // 
+            this.button3.Enabled = false;
+            this.button3.Location = new System.Drawing.Point(447, 29);
+            this.button3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(73, 38);
+            this.button3.TabIndex = 11;
+            this.button3.Text = "关闭";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // label10
             // 
@@ -129,7 +141,7 @@
             this.Plc_onePort.Name = "Plc_onePort";
             this.Plc_onePort.Size = new System.Drawing.Size(57, 21);
             this.Plc_onePort.TabIndex = 7;
-            this.Plc_onePort.Text = "9701";
+            this.Plc_onePort.Text = "2080";
             // 
             // label12
             // 
@@ -147,7 +159,7 @@
             this.Plc_oneIp.Name = "Plc_oneIp";
             this.Plc_oneIp.Size = new System.Drawing.Size(104, 21);
             this.Plc_oneIp.TabIndex = 5;
-            this.Plc_oneIp.Text = "127.0.0.1";
+            this.Plc_oneIp.Text = "192.168.250.175";
             // 
             // RemoteBnt
             // 
@@ -176,7 +188,7 @@
             this.PlcPort.Name = "PlcPort";
             this.PlcPort.Size = new System.Drawing.Size(57, 21);
             this.PlcPort.TabIndex = 2;
-            this.PlcPort.Text = "2061";
+            this.PlcPort.Text = "2060";
             // 
             // label1
             // 
@@ -194,7 +206,7 @@
             this.PlcIp.Name = "PlcIp";
             this.PlcIp.Size = new System.Drawing.Size(104, 21);
             this.PlcIp.TabIndex = 0;
-            this.PlcIp.Text = "127.0.0.1";
+            this.PlcIp.Text = "192.168.250.170";
             // 
             // groupBox2
             // 
@@ -218,6 +230,18 @@
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "与AOI_1连接";
+            // 
+            // button4
+            // 
+            this.button4.Enabled = false;
+            this.button4.Location = new System.Drawing.Point(447, 32);
+            this.button4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(73, 38);
+            this.button4.TabIndex = 12;
+            this.button4.Text = "关闭";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button1
             // 
@@ -343,6 +367,18 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "与AOI_2连接";
             // 
+            // button5
+            // 
+            this.button5.Enabled = false;
+            this.button5.Location = new System.Drawing.Point(445, 33);
+            this.button5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(73, 38);
+            this.button5.TabIndex = 13;
+            this.button5.Text = "关闭";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(357, 33);
@@ -443,42 +479,6 @@
             this.Aoi2_oneIp.Size = new System.Drawing.Size(104, 21);
             this.Aoi2_oneIp.TabIndex = 0;
             this.Aoi2_oneIp.Text = "127.0.0.1";
-            // 
-            // button3
-            // 
-            this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(447, 29);
-            this.button3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(73, 38);
-            this.button3.TabIndex = 11;
-            this.button3.Text = "关闭";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // button4
-            // 
-            this.button4.Enabled = false;
-            this.button4.Location = new System.Drawing.Point(447, 32);
-            this.button4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(73, 38);
-            this.button4.TabIndex = 12;
-            this.button4.Text = "关闭";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
-            // 
-            // button5
-            // 
-            this.button5.Enabled = false;
-            this.button5.Location = new System.Drawing.Point(445, 33);
-            this.button5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(73, 38);
-            this.button5.TabIndex = 13;
-            this.button5.Text = "关闭";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // SignalForward
             // 
