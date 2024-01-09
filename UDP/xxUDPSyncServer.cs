@@ -44,7 +44,7 @@ namespace SignalForward.UDP
 
         private AsyncUDPState udpReceiveState = null;
 
-        public ILog? Logger;
+        private ILog? _logger;
 
         /// <summary>
         /// 同步UdpClient UDP服务器
@@ -57,7 +57,7 @@ namespace SignalForward.UDP
             this.Address = localIPAddress;
             this.Port = listenPort;
             this.Encoding = Encoding.Default;
-            Logger = logger;
+            _logger = logger;
             //_clients = new List<AsyncUDPSocketState>();
             _server = new UdpClient(new IPEndPoint(this.Address, this.Port));
             _server.Client.ReceiveBufferSize = ReceiveBufferSize;
@@ -147,7 +147,7 @@ namespace SignalForward.UDP
             }
             catch (Exception e)
             {
-                Logger.Error("同步发送消息失败:" + e.Message, e);
+                _logger?.Error("同步发送消息失败:" + e.Message, e);
             }
         }
 
@@ -164,7 +164,7 @@ namespace SignalForward.UDP
             }
             catch (Exception e)
             {
-                Logger.Error("开始异步发送消息失败:" + e.Message, e);
+                _logger?.Error("开始异步发送消息失败:" + e.Message, e);
             }
         }
 
@@ -181,7 +181,7 @@ namespace SignalForward.UDP
                 }
                 catch (Exception e)
                 {
-                    Logger.Error("结束异步发送消息失败:" + e.Message, e);
+                    _logger?.Error("结束异步发送消息失败:" + e.Message, e);
                 }
             }
         }
