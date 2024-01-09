@@ -79,7 +79,7 @@ namespace SignalForward
             Aoi2Ip.DataBindings.Add("Enabled", button2, "Enabled");
             Aoi2Port.DataBindings.Add("Enabled", button2, "Enabled");
 
-            Task.Factory.StartNew(Transmit, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(CbTransmit, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(Remove, TaskCreationOptions.LongRunning);
         }
 
@@ -353,6 +353,8 @@ namespace SignalForward
             }
         }
 
+        #region 成品
+
         /// <summary>
         /// 转发AOI发送的消息给PLC
         /// </summary>
@@ -511,8 +513,8 @@ namespace SignalForward
                                         re[1] = 1;
                                         re[2] = 2;
                                         re[3] = 0;
-                                        re[9] = c[9];
-                                        re[10] = c[10];
+                                        re[11] = c[9];
+                                        re[12] = c[10];
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info("发送结果O->PLC:");
                                         Logger?.Info(re);
@@ -646,6 +648,328 @@ namespace SignalForward
             }
         }
 
+        #endregion 成品
+
+        #region 出版
+
+        /// <summary>
+        /// 转发AOI发送的消息给PLC
+        /// </summary>
+        private void CbTransmit()
+        {
+            while (true)
+            {
+                try
+                {
+                    long timeOut;
+                    DateTime beforeDt = default;
+                    //拍照中
+                    var inPhoto = true;
+                    //拍照完成
+                    var photoCompleted = true;
+                    //检测完成
+                    var complete = true;
+                    //收到的消息
+                    byte[] value = default;
+                    if (RemoteQueue == null || _plcIpEndPoint == null || RemoveQueue == null)
+                    {
+                        continue;
+                    }
+                    RemoteQueue.Dequeue(out value);
+                    Logger?.Info(value);
+                    switch (value[66])
+                    {
+                        case 1:
+                            var destination1 = value.Skip(34).Take(44 - 34).ToArray();
+                            timeOut = 0;
+                            beforeDt = DateTime.Now;
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
+                            {
+                                lock (this)
+                                {
+                                    //拍照中
+                                    var a = Aoi1Message.Find(item =>
+                                           item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination1)
+                                       );
+                                    if (a != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 0;
+                                        re[3] = 0;
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("拍照中O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        inPhoto = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                    }
+
+                                    //拍照完成
+                                    var b = Aoi1Message.Find(item =>
+                                           item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination1)
+                                       );
+                                    if (b != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 1;
+                                        re[3] = 0;
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("拍照完成O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        photoCompleted = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
+                                    }
+
+                                    //检测完成
+                                    var c = Aoi1Message.Find(item =>
+                                          item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination1)
+                                      );
+                                    if (c != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 2;
+                                        re[3] = 0;
+                                        if (c[11] == 2)
+                                        {
+                                            re[9] = 2;
+                                        }
+                                        else
+                                        {
+                                            re[9] = 1;
+                                        }
+                                        //re[9] = c[9];
+                                        re[12] = c[12];
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("发送结果O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        complete = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
+                                    }
+                                    var afterDt = DateTime.Now;
+                                    var ts = afterDt.Subtract(beforeDt);
+                                    timeOut = ts.Milliseconds;
+                                }
+                            }
+                            RemoveQueue.Enqueue(value);
+                            break;
+
+                        case 2:
+                            var destination2 = value.Skip(44).Take(54 - 44).ToArray();
+                            timeOut = 0;
+                            beforeDt = DateTime.Now;
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
+                            {
+                                lock (this)
+                                {
+                                    //拍照中
+                                    var a = Aoi2Message.Find(item =>
+                                        item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination2)
+                                    );
+                                    if (a != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 0;
+                                        re[3] = 0;
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("拍照中O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        inPhoto = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
+                                    }
+
+                                    //拍照完成
+                                    var b = Aoi2Message.Find(item =>
+                                        item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination2)
+                                    );
+                                    if (b != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 1;
+                                        re[3] = 0;
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("拍照完成O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        photoCompleted = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
+                                    }
+
+                                    //检测完成
+                                    var c = Aoi2Message.Find(item =>
+                                        item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination2)
+                                    );
+                                    if (c != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 2;
+                                        re[3] = 0;
+                                        if (c[11] == 2)
+                                        {
+                                            re[9] = 2;
+                                        }
+                                        else
+                                        {
+                                            re[9] = 1;
+                                        }
+                                        re[11] = c[12];
+                                        //re[12] = c[11];
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("发送结果O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        complete = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
+                                    }
+                                    var afterDt = DateTime.Now;
+                                    var ts = afterDt.Subtract(beforeDt);
+                                    timeOut = ts.Milliseconds;
+                                }
+                            }
+                            RemoveQueue.Enqueue(value);
+                            break;
+
+                        case 3:
+                            var destination3 = value.Skip(34).Take(44 - 34).ToArray();
+                            var destination4 = value.Skip(44).Take(54 - 44).ToArray();
+                            timeOut = 0;
+                            beforeDt = DateTime.Now;
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 1000)
+                            {
+                                lock (this)
+                                {
+                                    //拍照中
+                                    var a = Aoi1Message.Find(item =>
+                                        item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
+                                    );
+                                    var a1 = Aoi2Message.Find(item =>
+                                        item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
+                                    );
+                                    if (a != null && a1 != null)
+                                    {
+                                        //if (a != null && a1 != null)
+                                        //{
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 0;
+                                        re[3] = 0;
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("拍照中O->PLC");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        inPhoto = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
+                                        //}
+                                        //else if (a1 != null)
+                                        //{
+                                        //    byte[] re = new byte[value.Length];
+                                        //    Array.Copy(value, re, value.Length);
+                                        //    re[1] = 1;
+                                        //    re[2] = 0;
+                                        //    re[3] = 0;
+                                        //    _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        //    log.Info("O->PLC:");
+                                        //    log.Info(re);
+                                        //    log.Info("-------------------------");
+                                        //    inPhoto = false;
+                                        //    //Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                        //    Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
+                                        //}
+                                    }
+
+                                    //拍照完成
+                                    var b = Aoi1Message.Find(item =>
+                                        item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
+                                    );
+                                    var b1 = Aoi2Message.Find(item =>
+                                        item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
+                                    );
+                                    if (b != null && b1 != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 1;
+                                        re[3] = 0;
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("拍照完成O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        photoCompleted = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(b1));
+                                    }
+
+                                    //检测完成
+                                    var c = Aoi1Message.Find(item =>
+                                        item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
+                                    );
+                                    var c1 = Aoi2Message.Find(item =>
+                                        item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
+                                    );
+                                    if (c != null && c1 != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 2;
+                                        re[3] = 0;
+                                        if (c[11] == 2 || c1[11] == 2)
+                                        {
+                                            re[9] = 2;
+                                        }
+                                        else
+                                        {
+                                            re[9] = 1;
+                                        }
+                                        //re[10] = c[10];
+                                        re[11] = c1[12];
+                                        re[12] = c[12];
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        Logger?.Info("发送结果O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        complete = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(c1));
+                                    }
+                                    var afterDt = DateTime.Now;
+                                    var ts = afterDt.Subtract(beforeDt);
+                                    timeOut = ts.Milliseconds;
+                                }
+                            }
+                            RemoveQueue.Enqueue(value);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger?.Error("返回消息给PLC出错:" + e.Message, e);
+                }
+            }
+        }
+
+        #endregion 出版
+
         /// <summary>
         /// 转发AOI发送的检测清除信号
         /// </summary>
@@ -685,7 +1009,7 @@ namespace SignalForward
                                         Array.Copy(value, re, value.Length);
                                         re[1] = 0;
                                         re[2] = 3;
-                                        re[3] = 0;
+                                        re[3] = 1;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info(re);
                                         clear = false;
@@ -702,7 +1026,7 @@ namespace SignalForward
                                         Array.Copy(value, re, value.Length);
                                         re[1] = 1;
                                         re[2] = 3;
-                                        re[3] = 0;
+                                        re[3] = 1;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info(re);
                                         complete = false;
