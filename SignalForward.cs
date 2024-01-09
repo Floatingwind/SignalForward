@@ -204,7 +204,7 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
-                                    _localUdp.Send(_Aoi1PortEndPoint, newBytes);
+                                    _localUdp.SendAsync(_Aoi1PortEndPoint, newBytes);
                                     RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
@@ -219,7 +219,7 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
-                                    _localUdp1.Send(_Aoi2PortEndPoint, newBytes);
+                                    _localUdp1.SendAsync(_Aoi2PortEndPoint, newBytes);
                                     RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
@@ -241,8 +241,8 @@ namespace SignalForward
                                     {
                                         newBytes1[34 + i] = data1[i];
                                     }
-                                    _localUdp.Send(_Aoi1PortEndPoint, newBytes);
-                                    _localUdp1.Send(_Aoi2PortEndPoint, newBytes1);
+                                    _localUdp.SendAsync(_Aoi1PortEndPoint, newBytes);
+                                    _localUdp1.SendAsync(_Aoi2PortEndPoint, newBytes1);
                                     RemoteQueue.Enqueue(dataBytes);
                                 }
                                 break;
@@ -250,7 +250,6 @@ namespace SignalForward
                             default:
                                 break;
                         }
-
                     }
                 };
                 _remoteUdp.Start();
@@ -265,9 +264,7 @@ namespace SignalForward
                     _remoteUdp.Dispose();
                     _remoteUdp = null;
                 }
-
             }
-
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -282,11 +279,12 @@ namespace SignalForward
                     int.Parse(Aoi_onePort.Text.Trim()), log);
                 _localUdp.DataReceived += (o, bytes) =>
                 {
-                    log.Info("AOI1->O:" + bytes);
+                    log.Info("接收AOI1消息:");
+                    log.Info(bytes);
+                    log.Info("-------------------------");
                     lock (this)
                     {
                         Aoi1Message.Add(bytes);
-
                     }
                 };
                 _localUdp.Start();
@@ -316,7 +314,9 @@ namespace SignalForward
                     int.Parse(Aoi2_onePort.Text.Trim()), log);
                 _localUdp1.DataReceived += (o, bytes) =>
                 {
-                    log.Info("AOI2->O:" + bytes);
+                    log.Info("接收AOI2消息:");
+                    log.Info(bytes);
+                    log.Info("-------------------------");
                     lock (this)
                     {
                         Aoi2Message.Add(bytes);
@@ -336,7 +336,6 @@ namespace SignalForward
                 }
             }
         }
-
 
         private void Transmit()
         {
@@ -378,7 +377,9 @@ namespace SignalForward
                                         re[2] = 0;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info("O->PLC" + re);
+                                        log.Info("拍照中O->PLC:");
+                                        log.Info(re);
+                                        log.Info("-------------------------");
                                         inPhoto = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
@@ -395,7 +396,9 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info("O->PLC" + re);
+                                        log.Info("拍照完成O->PLC:");
+                                        log.Info(re);
+                                        log.Info("-------------------------");
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
@@ -414,7 +417,9 @@ namespace SignalForward
                                         re[9] = c[9];
                                         re[10] = c[10];
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info("O->PLC" + re);
+                                        log.Info("发送结果O->PLC:");
+                                        log.Info(re);
+                                        log.Info("-------------------------");
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
@@ -446,7 +451,9 @@ namespace SignalForward
                                         re[2] = 0;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info("O->PLC" + re);
+                                        log.Info("拍照中O->PLC:");
+                                        log.Info(re);
+                                        log.Info("-------------------------");
                                         inPhoto = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
@@ -463,7 +470,9 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info("O->PLC" + re);
+                                        log.Info("拍照完成O->PLC:");
+                                        log.Info(re);
+                                        log.Info("-------------------------");
                                         photoCompleted = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
@@ -482,7 +491,9 @@ namespace SignalForward
                                         re[9] = c[9];
                                         re[10] = c[10];
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info("发送结果O->PLC:");
                                         log.Info(re);
+                                        log.Info("-------------------------");
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
@@ -510,35 +521,38 @@ namespace SignalForward
                                     var a1 = Aoi2Message.Find(item =>
                                         item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
                                     );
-                                    if (a != null || a1 != null)
+                                    if (a != null && a1 != null)
                                     {
-                                        if (a != null)
-                                        {
-                                            byte[] re = new byte[value.Length];
-                                            Array.Copy(value, re, value.Length);
-                                            re[1] = 1;
-                                            re[2] = 0;
-                                            re[3] = 0;
-                                            _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                            log.Info("O->PLC" + re);
-                                            inPhoto = false;
-                                            Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
-                                            //Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
-                                        }
-                                        else if (a1 != null)
-                                        {
-                                            byte[] re = new byte[value.Length];
-                                            Array.Copy(value, re, value.Length);
-                                            re[1] = 1;
-                                            re[2] = 0;
-                                            re[3] = 0;
-                                            _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                            log.Info("O->PLC" + re);
-                                            inPhoto = false;
-                                            //Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
-                                            Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
-                                        }
-
+                                        //if (a != null && a1 != null)
+                                        //{
+                                        byte[] re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+                                        re[1] = 1;
+                                        re[2] = 0;
+                                        re[3] = 0;
+                                        _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info("拍照中O->PLC");
+                                        log.Info(re);
+                                        log.Info("-------------------------");
+                                        inPhoto = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
+                                        //}
+                                        //else if (a1 != null)
+                                        //{
+                                        //    byte[] re = new byte[value.Length];
+                                        //    Array.Copy(value, re, value.Length);
+                                        //    re[1] = 1;
+                                        //    re[2] = 0;
+                                        //    re[3] = 0;
+                                        //    _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        //    log.Info("O->PLC:");
+                                        //    log.Info(re);
+                                        //    log.Info("-------------------------");
+                                        //    inPhoto = false;
+                                        //    //Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                                        //    Aoi2Message.RemoveAll(item => item.SequenceEqual(a1));
+                                        //}
                                     }
 
                                     //拍照完成
@@ -556,7 +570,9 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
+                                        log.Info("拍照完成O->PLC:");
                                         log.Info(re);
+                                        log.Info("-------------------------");
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b1));
@@ -581,7 +597,9 @@ namespace SignalForward
                                         re[11] = c1[9];
                                         re[12] = c1[10];
                                         _remoteUdp.SendAsync(_plcIpEndPoint, re);
-                                        log.Info("O->PLC" + re);
+                                        log.Info("发送结果O->PLC:");
+                                        log.Info(re);
+                                        log.Info("-------------------------");
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c1));
@@ -600,9 +618,8 @@ namespace SignalForward
                 }
                 catch (Exception e)
                 {
-                    log.Debug(e.Message, e);
+                    log.Error("返回消息给PLC出错:" + e.Message, e);
                 }
-
             }
         }
 
@@ -769,7 +786,6 @@ namespace SignalForward
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b1));
-
                                     }
                                     DateTime afterDT = System.DateTime.Now;
                                     TimeSpan ts = afterDT.Subtract(beforeDT);
@@ -787,7 +803,6 @@ namespace SignalForward
                 {
                     log.Debug(e.Message, e);
                 }
-
             }
         }
 
@@ -803,7 +818,6 @@ namespace SignalForward
                     _remoteUdp.Dispose();
                     _remoteUdp = null;
                 }
-
             }
             catch (Exception exception)
             {
@@ -830,7 +844,6 @@ namespace SignalForward
                 Console.WriteLine(exception);
                 throw;
             }
-
         }
 
         private void button5_Click(object sender, EventArgs e)

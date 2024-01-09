@@ -147,7 +147,7 @@ namespace SignalForward.UDP
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message, e);
+                Logger.Error("同步发送消息失败:" + e.Message, e);
             }
         }
 
@@ -164,7 +164,7 @@ namespace SignalForward.UDP
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message, e);
+                Logger.Error("开始异步发送消息失败:" + e.Message, e);
             }
         }
 
@@ -177,11 +177,11 @@ namespace SignalForward.UDP
                 {
                     _server.EndSend(ar);
                     //消息发送完毕事件
-
                     // Logger.Info("fa");
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Logger.Error("结束异步发送消息失败:" + e.Message, e);
                 }
             }
         }
