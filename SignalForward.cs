@@ -1097,7 +1097,7 @@ namespace SignalForward
                             timeOut = 0;
                             beforeDt = DateTime.Now;
 
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 600)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 980)
                             {
 
                                 //拍照中
@@ -1177,14 +1177,14 @@ namespace SignalForward
                                 var ts = afterDt.Subtract(beforeDt);
                                 timeOut = ts.Milliseconds;
                             }
-
+                            RemoveQueue.Enqueue(value);
                             break;
 
                         case 2:
                             var destination2 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 600)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 980)
                             {
 
                                 //拍照中
@@ -1262,7 +1262,7 @@ namespace SignalForward
                                 var ts = afterDt.Subtract(beforeDt);
                                 timeOut = ts.Milliseconds;
                             }
-
+                            RemoveQueue.Enqueue(value);
                             break;
 
                         case 3:
@@ -1270,7 +1270,7 @@ namespace SignalForward
                             var destination4 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 600)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 980)
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
@@ -1386,7 +1386,7 @@ namespace SignalForward
                                 var ts = afterDt.Subtract(beforeDt);
                                 timeOut = ts.Milliseconds;
                             }
-
+                            RemoveQueue.Enqueue(value);
                             break;
 
                         default:
