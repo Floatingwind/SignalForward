@@ -67,9 +67,12 @@
             this.Aoi2_onePort = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.Aoi2_oneIp = new System.Windows.Forms.TextBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label18 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -112,7 +115,7 @@
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(28, 63);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(41, 12);
+            this.label10.Size = new System.Drawing.Size(46, 13);
             this.label10.TabIndex = 10;
             this.label10.Text = "本软件";
             // 
@@ -121,7 +124,7 @@
             this.plc.AutoSize = true;
             this.plc.Location = new System.Drawing.Point(28, 29);
             this.plc.Name = "plc";
-            this.plc.Size = new System.Drawing.Size(23, 12);
+            this.plc.Size = new System.Drawing.Size(28, 13);
             this.plc.TabIndex = 9;
             this.plc.Text = "PLC";
             // 
@@ -130,7 +133,7 @@
             this.label11.AutoSize = true;
             this.label11.Location = new System.Drawing.Point(237, 65);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(41, 12);
+            this.label11.Size = new System.Drawing.Size(48, 13);
             this.label11.TabIndex = 8;
             this.label11.Text = "Port：";
             // 
@@ -148,7 +151,7 @@
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(83, 64);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(29, 12);
+            this.label12.Size = new System.Drawing.Size(34, 13);
             this.label12.TabIndex = 6;
             this.label12.Text = "IP：";
             // 
@@ -177,7 +180,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(237, 30);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(41, 12);
+            this.label2.Size = new System.Drawing.Size(48, 13);
             this.label2.TabIndex = 3;
             this.label2.Text = "Port：";
             // 
@@ -195,7 +198,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(83, 29);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 12);
+            this.label1.Size = new System.Drawing.Size(34, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "IP：";
             // 
@@ -259,7 +262,7 @@
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(26, 71);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(35, 12);
+            this.label13.Size = new System.Drawing.Size(42, 13);
             this.label13.TabIndex = 10;
             this.label13.Text = "AOI_1";
             // 
@@ -268,7 +271,7 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(23, 32);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(41, 12);
+            this.label9.Size = new System.Drawing.Size(46, 13);
             this.label9.TabIndex = 9;
             this.label9.Text = "本软件";
             // 
@@ -277,7 +280,7 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(232, 71);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(41, 12);
+            this.label7.Size = new System.Drawing.Size(48, 13);
             this.label7.TabIndex = 8;
             this.label7.Text = "Port：";
             // 
@@ -295,7 +298,7 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(80, 71);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(29, 12);
+            this.label8.Size = new System.Drawing.Size(34, 13);
             this.label8.TabIndex = 6;
             this.label8.Text = "IP：";
             // 
@@ -313,7 +316,7 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(232, 32);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.Size = new System.Drawing.Size(48, 13);
             this.label3.TabIndex = 3;
             this.label3.Text = "Port：";
             // 
@@ -331,7 +334,7 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(80, 32);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(29, 12);
+            this.label4.Size = new System.Drawing.Size(34, 13);
             this.label4.TabIndex = 1;
             this.label4.Text = "IP：";
             // 
@@ -395,7 +398,7 @@
             this.label17.AutoSize = true;
             this.label17.Location = new System.Drawing.Point(24, 66);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(35, 12);
+            this.label17.Size = new System.Drawing.Size(42, 13);
             this.label17.TabIndex = 10;
             this.label17.Text = "AOI_2";
             // 
@@ -404,7 +407,7 @@
             this.label16.AutoSize = true;
             this.label16.Location = new System.Drawing.Point(21, 25);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(41, 12);
+            this.label16.Size = new System.Drawing.Size(46, 13);
             this.label16.TabIndex = 9;
             this.label16.Text = "本软件";
             // 
@@ -413,7 +416,7 @@
             this.label14.AutoSize = true;
             this.label14.Location = new System.Drawing.Point(228, 66);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(41, 12);
+            this.label14.Size = new System.Drawing.Size(48, 13);
             this.label14.TabIndex = 8;
             this.label14.Text = "Port：";
             // 
@@ -431,7 +434,7 @@
             this.label15.AutoSize = true;
             this.label15.Location = new System.Drawing.Point(76, 66);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(29, 12);
+            this.label15.Size = new System.Drawing.Size(34, 13);
             this.label15.TabIndex = 6;
             this.label15.Text = "IP：";
             // 
@@ -449,7 +452,7 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(228, 25);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(41, 12);
+            this.label5.Size = new System.Drawing.Size(48, 13);
             this.label5.TabIndex = 3;
             this.label5.Text = "Port：";
             // 
@@ -467,7 +470,7 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(76, 25);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(29, 12);
+            this.label6.Size = new System.Drawing.Size(34, 13);
             this.label6.TabIndex = 1;
             this.label6.Text = "IP：";
             // 
@@ -480,11 +483,39 @@
             this.Aoi2_oneIp.TabIndex = 0;
             this.Aoi2_oneIp.Text = "127.0.0.1";
             // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(176, 327);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(67, 21);
+            this.numericUpDown1.TabIndex = 3;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            600,
+            0,
+            0,
+            0});
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(12, 331);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(164, 13);
+            this.label18.TabIndex = 4;
+            this.label18.Text = "触发回复间隔时间(毫秒)：";
+            // 
             // SignalForward
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(684, 489);
+            this.Controls.Add(this.label18);
+            this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -497,7 +528,9 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -542,5 +575,7 @@
         private Button button3;
         private Button button4;
         private Button button5;
+        private NumericUpDown numericUpDown1;
+        private Label label18;
     }
 }

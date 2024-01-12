@@ -68,6 +68,7 @@ namespace SignalForward
         /// </summary>
         public SpinLock spinLock1 = new();
 
+        private static int _timeout;
 
         public SignalForward()
         {
@@ -89,6 +90,7 @@ namespace SignalForward
             Aoi2_onePort.DataBindings.Add("Enabled", button2, "Enabled");
             Aoi2Ip.DataBindings.Add("Enabled", button2, "Enabled");
             Aoi2Port.DataBindings.Add("Enabled", button2, "Enabled");
+            numericUpDown1.DataBindings.Add("Enabled", button2, "Enabled");
 
             Task.Factory.StartNew(Transmit, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(Remove, TaskCreationOptions.LongRunning);
@@ -344,6 +346,7 @@ namespace SignalForward
 
                 };
                 _localUdp1.Start();
+                _timeout = ((int)numericUpDown1.Value);
             }
             catch (Exception exception)
             {
@@ -1097,7 +1100,7 @@ namespace SignalForward
                             timeOut = 0;
                             beforeDt = DateTime.Now;
 
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 980)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
 
                                 //拍照中
@@ -1175,7 +1178,7 @@ namespace SignalForward
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
                             RemoveQueue.Enqueue(value);
                             break;
@@ -1184,7 +1187,7 @@ namespace SignalForward
                             var destination2 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 980)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
 
                                 //拍照中
@@ -1260,7 +1263,7 @@ namespace SignalForward
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
                             RemoveQueue.Enqueue(value);
                             break;
@@ -1270,7 +1273,7 @@ namespace SignalForward
                             var destination4 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 980)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
@@ -1384,7 +1387,7 @@ namespace SignalForward
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
                             RemoveQueue.Enqueue(value);
                             break;
@@ -1400,7 +1403,7 @@ namespace SignalForward
             }
         }
 
-        #endregion 成品
+        #endregion
 
         #region 出版
 
@@ -1435,7 +1438,7 @@ namespace SignalForward
                             var destination1 = value.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 600)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
 
                                 //拍照中
@@ -1520,7 +1523,7 @@ namespace SignalForward
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
                             RemoveQueue.Enqueue(value);
                             break;
@@ -1529,7 +1532,7 @@ namespace SignalForward
                             var destination2 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 600)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
 
                                 //拍照中
@@ -1612,7 +1615,7 @@ namespace SignalForward
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
                             RemoveQueue.Enqueue(value);
                             break;
@@ -1622,7 +1625,7 @@ namespace SignalForward
                             var destination4 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 600)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
@@ -1739,7 +1742,7 @@ namespace SignalForward
                                 }
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
                             RemoveQueue.Enqueue(value);
                             break;
@@ -1755,7 +1758,7 @@ namespace SignalForward
             }
         }
 
-        #endregion 出版
+        #endregion
 
         /// <summary>
         /// 转发AOI发送的检测清除信号
@@ -1827,7 +1830,7 @@ namespace SignalForward
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
                             break;
 
@@ -1880,7 +1883,7 @@ namespace SignalForward
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
 
                             break;
@@ -1959,7 +1962,7 @@ namespace SignalForward
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Milliseconds;
+                                timeOut = ts.Ticks / 10000;
                             }
 
                             break;
