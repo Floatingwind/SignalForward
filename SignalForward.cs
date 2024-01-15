@@ -1,4 +1,5 @@
 ﻿using SignalForward.UDP;
+using System.Collections;
 using System.Net;
 using System.Reflection;
 
@@ -306,7 +307,7 @@ namespace SignalForward
                     Logger.Info("接收AOI1消息:");
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
-                    LockMethod(() => { Aoi1Message.Add(bytes); });
+                    LockMethod(() => { Aoi1Message.Add(bytes); }, (Aoi1Message as ICollection).SyncRoot);
 
                 };
                 _localUdp.Start();
@@ -342,7 +343,7 @@ namespace SignalForward
                     Logger.Info("接收AOI2消息:");
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
-                    LockMethod1(() => { Aoi2Message.Add(bytes); });
+                    LockMethod1(() => { Aoi2Message.Add(bytes); }, (Aoi2Message as ICollection).SyncRoot);
 
                 };
                 _localUdp1.Start();
@@ -1125,7 +1126,7 @@ namespace SignalForward
                                         inPhoto = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
 
                                 //拍照完成
@@ -1149,7 +1150,7 @@ namespace SignalForward
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 //检测完成
                                 LockMethod(() =>
@@ -1174,7 +1175,7 @@ namespace SignalForward
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1211,7 +1212,7 @@ namespace SignalForward
                                         inPhoto = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 //拍照完成
                                 LockMethod1(() =>
@@ -1234,7 +1235,7 @@ namespace SignalForward
                                         photoCompleted = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 //检测完成
                                 LockMethod1(() =>
@@ -1259,7 +1260,7 @@ namespace SignalForward
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1286,12 +1287,12 @@ namespace SignalForward
                                 LockMethod(() =>
                                 {
                                     a = Aoi1Message.Find(item => item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3));
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 LockMethod1(() =>
                                 {
                                     a1 = Aoi2Message.Find(item => item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4));
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 if (a != null && a1 != null)
                                 {
@@ -1306,8 +1307,8 @@ namespace SignalForward
                                     Logger?.Info("-------------------------");
                                     inPhoto = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
 
                                 }
 
@@ -1318,7 +1319,7 @@ namespace SignalForward
                                     item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray()
                                         .SequenceEqual(destination3)
                                 );
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 LockMethod1(() =>
                                 {
@@ -1326,7 +1327,7 @@ namespace SignalForward
                                     item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray()
                                         .SequenceEqual(destination4)
                                 );
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 if (b != null && b1 != null)
                                 {
@@ -1341,8 +1342,8 @@ namespace SignalForward
                                     Logger?.Info("-------------------------");
                                     photoCompleted = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
 
                                 }
 
@@ -1353,7 +1354,7 @@ namespace SignalForward
                                     item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray()
                                         .SequenceEqual(destination3)
                                 );
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 LockMethod1(() =>
                                 {
@@ -1361,7 +1362,7 @@ namespace SignalForward
                                     item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray()
                                         .SequenceEqual(destination4)
                                 );
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 if (c != null && c1 != null)
                                 {
@@ -1380,8 +1381,8 @@ namespace SignalForward
                                     Logger?.Info("-------------------------");
                                     complete = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); }, (Aoi1Message as ICollection).SyncRoot);
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); }, (Aoi2Message as ICollection).SyncRoot);
 
                                 }
 
@@ -1462,7 +1463,7 @@ namespace SignalForward
                                         inPhoto = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 //拍照完成
                                 LockMethod(() =>
@@ -1485,7 +1486,7 @@ namespace SignalForward
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 //检测完成
                                 LockMethod(() =>
@@ -1519,7 +1520,7 @@ namespace SignalForward
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1556,7 +1557,7 @@ namespace SignalForward
                                         inPhoto = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 //拍照完成
                                 LockMethod1(() =>
@@ -1579,7 +1580,7 @@ namespace SignalForward
                                         photoCompleted = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 //检测完成
                                 LockMethod1(() =>
@@ -1611,7 +1612,7 @@ namespace SignalForward
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1641,14 +1642,14 @@ namespace SignalForward
                                         item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray()
                                             .SequenceEqual(destination3)
                                     );
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
                                 LockMethod1(() =>
                                 {
                                     a1 = Aoi2Message.Find(item =>
                                         item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray()
                                             .SequenceEqual(destination4)
                                     );
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 if (a != null && a1 != null)
                                 {
@@ -1662,8 +1663,8 @@ namespace SignalForward
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
                                     inPhoto = false;
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
 
                                 }
 
@@ -1673,13 +1674,13 @@ namespace SignalForward
                                     b = Aoi1Message.Find(item =>
                                    item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
                                );
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
                                 LockMethod1(() =>
                                 {
                                     b1 = Aoi2Message.Find(item =>
                                     item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
                                 );
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 if (b != null && b1 != null)
                                 {
@@ -1694,8 +1695,8 @@ namespace SignalForward
                                     Logger?.Info("-------------------------");
                                     photoCompleted = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
 
                                 }
 
@@ -1705,13 +1706,13 @@ namespace SignalForward
                                     c = Aoi1Message.Find(item =>
                                     item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
                                 );
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
                                 LockMethod1(() =>
                                 {
                                     c1 = Aoi2Message.Find(item =>
                                     item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
                                 );
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 if (c != null && c1 != null)
                                 {
@@ -1736,8 +1737,8 @@ namespace SignalForward
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
                                     complete = false;
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); }, (Aoi1Message as ICollection).SyncRoot);
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); }, (Aoi2Message as ICollection).SyncRoot);
 
                                 }
                                 var afterDt = DateTime.Now;
@@ -1807,7 +1808,7 @@ namespace SignalForward
                                         clear = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
                                 //发送就绪信号
                                 LockMethod(() =>
                                 {
@@ -1826,7 +1827,7 @@ namespace SignalForward
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1859,7 +1860,7 @@ namespace SignalForward
                                         clear = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 //发送就绪信号
                                 LockMethod1(() =>
@@ -1879,7 +1880,7 @@ namespace SignalForward
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1907,14 +1908,14 @@ namespace SignalForward
                                        item[1] == 0 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
                                            .SequenceEqual(destination3)
                                    );
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
                                 LockMethod1(() =>
                                 {
                                     a1 = Aoi2Message.Find(item =>
                                        item[1] == 0 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
                                            .SequenceEqual(destination4)
                                    );
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 if (a != null && a1 != null)
                                 {
@@ -1926,8 +1927,8 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info(re);
                                     clear = false;
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
 
                                 }
 
@@ -1937,13 +1938,13 @@ namespace SignalForward
                                     b = Aoi1Message.Find(item =>
                                    item[1] == 1 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
                                );
-                                });
+                                }, (Aoi1Message as ICollection).SyncRoot);
                                 LockMethod1(() =>
                                 {
                                     b1 = Aoi2Message.Find(item =>
                                     item[1] == 1 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
                                 );
-                                });
+                                }, (Aoi2Message as ICollection).SyncRoot);
 
                                 if (b != null && b1 != null)
                                 {
@@ -1955,8 +1956,8 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info(re);
                                     complete = false;
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
 
                                 }
 
@@ -2032,7 +2033,10 @@ namespace SignalForward
             }
         }
 
-
+        /// <summary>
+        /// 自旋锁
+        /// </summary>
+        /// <param name="action"></param>
         public void LockMethod(Action action)
         {
             bool gotLock = false;
@@ -2050,6 +2054,10 @@ namespace SignalForward
             finally { if (gotLock) spinLock.Exit(); }
         }
 
+        /// <summary>
+        /// 自旋锁
+        /// </summary>
+        /// <param name="action"></param>
         public void LockMethod1(Action action)
         {
             bool gotLock = false;
@@ -2065,6 +2073,51 @@ namespace SignalForward
 
             }
             finally { if (gotLock) spinLock1.Exit(); }
+        }
+
+
+        /// <summary>
+        /// 锁
+        /// </summary>
+        /// <param name="action"></param>
+        public void LockMethod(Action action, object stauts)
+        {
+
+            try
+            {
+                lock (stauts)
+                {
+                    action();
+                }
+            }
+            catch (Exception)
+            {
+
+
+            }
+
+        }
+
+        /// <summary>
+        /// 锁
+        /// </summary>
+        /// <param name="action"></param>
+        public void LockMethod1(Action action, object stauts)
+        {
+
+            try
+            {
+                lock (stauts)
+                {
+                    action();
+                }
+            }
+            catch (Exception)
+            {
+
+
+            }
+
         }
     }
 }
