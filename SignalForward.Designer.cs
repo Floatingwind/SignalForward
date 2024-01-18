@@ -523,7 +523,7 @@
             this.CB.TabStop = true;
             this.CB.Text = "出版";
             this.CB.UseVisualStyleBackColor = true;
-            this.CB.Click += new System.EventHandler(this.CB_Click);
+            this.CB.CheckedChanged += new System.EventHandler(this.CB_CheckedChanged);
             // 
             // CP
             // 
@@ -535,7 +535,7 @@
             this.CP.TabStop = true;
             this.CP.Text = "成品";
             this.CP.UseVisualStyleBackColor = true;
-            this.CP.Click += new System.EventHandler(this.CP_Click);
+            this.CP.CheckedChanged += new System.EventHandler(this.CP_CheckedChanged);
             // 
             // groupBox4
             // 
@@ -562,6 +562,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "SignalForward";
             this.Text = "SignalForward";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SignalForward_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

@@ -1,5 +1,4 @@
 ﻿using SignalForward.UDP;
-using System.Collections;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
@@ -81,6 +80,11 @@ namespace SignalForward
         /// </summary>
         private CancellationTokenSource? _tokenSource1;
 
+        /// <summary>
+        /// 令牌3
+        /// </summary>
+        private CancellationTokenSource? _tokenSource2 = new();
+
         private static int _timeout;
 
         public SignalForward()
@@ -105,7 +109,7 @@ namespace SignalForward
             Aoi2Port.DataBindings.Add("Enabled", button2, "Enabled");
             numericUpDown1.DataBindings.Add("Enabled", button2, "Enabled");
             InitParam();
-            Task.Factory.StartNew(Remove, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(Remove, _tokenSource2.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         #region 同步方式
@@ -281,7 +285,11 @@ namespace SignalForward
                             }
                             break;
 
+
                         default:
+                            Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
+                            Logger.Info(dataBytes);
+                            Logger.Info("-------------------------");
                             break;
                     }
                 };
@@ -315,10 +323,10 @@ namespace SignalForward
                     int.Parse(Aoi_onePort.Text.Trim()), Logger);
                 _localUdp.DataReceived += (o, bytes) =>
                 {
-                    Logger.Info("接收AOI1消息:");
+                    Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
-                    LockMethod(() => { Aoi1Message.Add(bytes); }, (Aoi1Message as ICollection).SyncRoot);
+                    LockMethod(() => { Aoi1Message.Add(bytes); });
                 };
                 _localUdp.Start();
             }
@@ -365,10 +373,10 @@ namespace SignalForward
                     int.Parse(Aoi2_onePort.Text.Trim()), Logger);
                 _localUdp1.DataReceived += (o, bytes) =>
                 {
-                    Logger.Info("接收AOI2消息:");
+                    Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI2消息:");
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
-                    LockMethod1(() => { Aoi2Message.Add(bytes); }, (Aoi2Message as ICollection).SyncRoot);
+                    LockMethod1(() => { Aoi2Message.Add(bytes); });
                 };
                 _localUdp1.Start();
                 _timeout = ((int)numericUpDown1.Value);
@@ -1144,13 +1152,13 @@ namespace SignalForward
                                         re[2] = 0;
                                         re[3] = 0;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("拍照中O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         inPhoto = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 //拍照完成
                                 LockMethod(() =>
@@ -1167,13 +1175,13 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("拍照完成O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 //检测完成
                                 LockMethod(() =>
@@ -1192,13 +1200,13 @@ namespace SignalForward
                                         re[9] = c[9];
                                         re[10] = c[10];
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("发送结果O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1228,13 +1236,13 @@ namespace SignalForward
                                         re[2] = 0;
                                         re[3] = 0;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("拍照中O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         inPhoto = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 //拍照完成
                                 LockMethod1(() =>
@@ -1251,13 +1259,13 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("拍照完成O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         photoCompleted = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 //检测完成
                                 LockMethod1(() =>
@@ -1276,13 +1284,13 @@ namespace SignalForward
                                         re[11] = c[9];
                                         re[12] = c[10];
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("发送结果O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1309,12 +1317,12 @@ namespace SignalForward
                                 LockMethod(() =>
                                 {
                                     a = Aoi1Message.Find(item => item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3));
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 LockMethod1(() =>
                                 {
                                     a1 = Aoi2Message.Find(item => item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4));
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 if (a != null && a1 != null)
                                 {
@@ -1324,13 +1332,13 @@ namespace SignalForward
                                     re[2] = 0;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info("拍照中O->PLC");
+                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC");
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
                                     inPhoto = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); });
                                 }
 
                                 //拍照完成
@@ -1340,7 +1348,7 @@ namespace SignalForward
                                     item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray()
                                         .SequenceEqual(destination3)
                                 );
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 LockMethod1(() =>
                                 {
@@ -1348,7 +1356,7 @@ namespace SignalForward
                                     item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray()
                                         .SequenceEqual(destination4)
                                 );
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 if (b != null && b1 != null)
                                 {
@@ -1358,13 +1366,13 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info("拍照完成O->PLC:");
+                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
                                     photoCompleted = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); });
                                 }
 
                                 //检测完成
@@ -1374,7 +1382,7 @@ namespace SignalForward
                                     item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray()
                                         .SequenceEqual(destination3)
                                 );
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 LockMethod1(() =>
                                 {
@@ -1382,7 +1390,7 @@ namespace SignalForward
                                     item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray()
                                         .SequenceEqual(destination4)
                                 );
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 if (c != null && c1 != null)
                                 {
@@ -1396,13 +1404,13 @@ namespace SignalForward
                                     re[11] = c1[9];
                                     re[12] = c1[10];
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info("发送结果O->PLC:");
+                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
                                     complete = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); }, (Aoi1Message as ICollection).SyncRoot);
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); }, (Aoi2Message as ICollection).SyncRoot);
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); });
                                 }
 
                                 var afterDt = DateTime.Now;
@@ -1476,13 +1484,13 @@ namespace SignalForward
                                         re[2] = 0;
                                         re[3] = 0;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("拍照中O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         inPhoto = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 //拍照完成
                                 LockMethod(() =>
@@ -1499,13 +1507,13 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("拍照完成O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 //检测完成
                                 LockMethod(() =>
@@ -1533,13 +1541,13 @@ namespace SignalForward
                                         //re[9] = c[9];
                                         re[12] = c[12];
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("发送结果O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1569,13 +1577,13 @@ namespace SignalForward
                                         re[2] = 0;
                                         re[3] = 0;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("拍照中O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         inPhoto = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 //拍照完成
                                 LockMethod1(() =>
@@ -1592,13 +1600,13 @@ namespace SignalForward
                                         re[2] = 1;
                                         re[3] = 0;
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("拍照完成O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         photoCompleted = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 //检测完成
                                 LockMethod1(() =>
@@ -1624,13 +1632,13 @@ namespace SignalForward
                                         re[11] = c[12];
                                         //re[12] = c[11];
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                        Logger?.Info("发送结果O->PLC:");
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1660,14 +1668,14 @@ namespace SignalForward
                                         item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray()
                                             .SequenceEqual(destination3)
                                     );
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
                                 LockMethod1(() =>
                                 {
                                     a1 = Aoi2Message.Find(item =>
                                         item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray()
                                             .SequenceEqual(destination4)
                                     );
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 if (a != null && a1 != null)
                                 {
@@ -1677,12 +1685,12 @@ namespace SignalForward
                                     re[2] = 0;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info("拍照中O->PLC");
+                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC");
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
                                     inPhoto = false;
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); });
                                 }
 
                                 //拍照完成
@@ -1691,13 +1699,13 @@ namespace SignalForward
                                     b = Aoi1Message.Find(item =>
                                    item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
                                );
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
                                 LockMethod1(() =>
                                 {
                                     b1 = Aoi2Message.Find(item =>
                                     item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
                                 );
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 if (b != null && b1 != null)
                                 {
@@ -1707,13 +1715,13 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info("拍照完成O->PLC:");
+                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
                                     photoCompleted = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); });
                                 }
 
                                 //检测完成
@@ -1722,13 +1730,13 @@ namespace SignalForward
                                     c = Aoi1Message.Find(item =>
                                     item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
                                 );
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
                                 LockMethod1(() =>
                                 {
                                     c1 = Aoi2Message.Find(item =>
                                     item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
                                 );
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 if (c != null && c1 != null)
                                 {
@@ -1749,12 +1757,12 @@ namespace SignalForward
                                     re[11] = c1[12];
                                     re[12] = c[12];
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info("发送结果O->PLC:");
+                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
                                     complete = false;
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); }, (Aoi1Message as ICollection).SyncRoot);
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); }, (Aoi2Message as ICollection).SyncRoot);
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); });
                                 }
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1783,6 +1791,7 @@ namespace SignalForward
         {
             while (true)
             {
+                _tokenSource2?.Token.ThrowIfCancellationRequested();
                 try
                 {
                     long timeOut;
@@ -1822,7 +1831,7 @@ namespace SignalForward
                                         clear = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
                                 //发送就绪信号
                                 LockMethod(() =>
                                 {
@@ -1841,7 +1850,7 @@ namespace SignalForward
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1874,7 +1883,7 @@ namespace SignalForward
                                         clear = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 //发送就绪信号
                                 LockMethod1(() =>
@@ -1894,7 +1903,7 @@ namespace SignalForward
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1922,14 +1931,14 @@ namespace SignalForward
                                        item[1] == 0 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
                                            .SequenceEqual(destination3)
                                    );
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
                                 LockMethod1(() =>
                                 {
                                     a1 = Aoi2Message.Find(item =>
                                        item[1] == 0 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
                                            .SequenceEqual(destination4)
                                    );
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 if (a != null && a1 != null)
                                 {
@@ -1941,8 +1950,8 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info(re);
                                     clear = false;
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); });
                                 }
 
                                 //发送就绪信号
@@ -1951,13 +1960,13 @@ namespace SignalForward
                                     b = Aoi1Message.Find(item =>
                                    item[1] == 1 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3)
                                );
-                                }, (Aoi1Message as ICollection).SyncRoot);
+                                });
                                 LockMethod1(() =>
                                 {
                                     b1 = Aoi2Message.Find(item =>
                                     item[1] == 1 && item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4)
                                 );
-                                }, (Aoi2Message as ICollection).SyncRoot);
+                                });
 
                                 if (b != null && b1 != null)
                                 {
@@ -1969,8 +1978,8 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info(re);
                                     complete = false;
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); });
                                 }
 
                                 var afterDt = DateTime.Now;
@@ -2127,41 +2136,6 @@ namespace SignalForward
             }
         }
 
-        private void CB_Click(object sender, EventArgs e)
-        {
-            CB.Enabled = false;
-            if (_tokenSource1 != null)
-            {
-                _tokenSource1.Cancel();
-                _tokenSource1.Dispose();
-                _tokenSource1 = null;
-            }
-            if (_tokenSource == null)
-            {
-                _tokenSource = new();
-            }
-            Task.Factory.StartNew(CbTransmit, _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            CP.Enabled = true;
-        }
-
-        private void CP_Click(object sender, EventArgs e)
-        {
-            CP.Enabled = false;
-            if (_tokenSource != null)
-            {
-                _tokenSource.Cancel();
-                _tokenSource.Dispose();
-                _tokenSource = null;
-            }
-            if (_tokenSource1 == null)
-            {
-                _tokenSource1 = new();
-            }
-            Task.Factory.StartNew(Transmit, _tokenSource1.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            CB.Enabled = true;
-        }
-
-
         private string JsonPath { get; set; } = "seting.Json";
 
         private async void SaveJsonData()
@@ -2212,6 +2186,7 @@ namespace SignalForward
                     if (JSON_Node!["CB"]!.GetValue<bool>())
                     {
                         CB.Checked = true;
+
                     }
                     if (JSON_Node!["CP"]!.GetValue<bool>())
                     {
@@ -2240,6 +2215,65 @@ namespace SignalForward
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        private void CB_CheckedChanged(object sender, EventArgs e)
+        {
+            if (CB.Checked)
+            {
+                CB.Enabled = false;
+                if (_tokenSource1 != null)
+                {
+                    _tokenSource1.Cancel();
+                    _tokenSource1.Dispose();
+                    _tokenSource1 = null;
+                }
+                if (_tokenSource == null)
+                {
+                    _tokenSource = new();
+                }
+                Task.Factory.StartNew(CbTransmit, _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                CP.Enabled = true;
+            }
+        }
+
+        private void CP_CheckedChanged(object sender, EventArgs e)
+        {
+            if (CP.Checked)
+            {
+                CP.Enabled = false;
+                if (_tokenSource != null)
+                {
+                    _tokenSource.Cancel();
+                    _tokenSource.Dispose();
+                    _tokenSource = null;
+                }
+                if (_tokenSource1 == null)
+                {
+                    _tokenSource1 = new();
+                }
+                Task.Factory.StartNew(Transmit, _tokenSource1.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                CB.Enabled = true;
+            }
+        }
+
+        private void SignalForward_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (_tokenSource != null)
+            {
+                _tokenSource.Cancel();
+                _tokenSource.Dispose();
+            }
+            if (_tokenSource1 != null)
+            {
+                _tokenSource1.Cancel();
+                _tokenSource1.Dispose();
+            }
+            if (_tokenSource2 != null)
+            {
+                _tokenSource2.Cancel();
+                _tokenSource2.Dispose();
             }
         }
     }
