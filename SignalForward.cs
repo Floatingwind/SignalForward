@@ -69,6 +69,16 @@ namespace SignalForward
         /// </summary>
         public SpinLock spinLock1 = new();
 
+        /// <summary>
+        ///  令牌
+        /// </summary>
+        private CancellationTokenSource? _tokenSource;
+
+        /// <summary>
+        /// 令牌2
+        /// </summary>
+        private CancellationTokenSource? _tokenSource1;
+
         private static int _timeout;
 
         public SignalForward()
@@ -93,7 +103,6 @@ namespace SignalForward
             Aoi2Port.DataBindings.Add("Enabled", button2, "Enabled");
             numericUpDown1.DataBindings.Add("Enabled", button2, "Enabled");
 
-            Task.Factory.StartNew(Transmit, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(Remove, TaskCreationOptions.LongRunning);
         }
 
@@ -308,7 +317,6 @@ namespace SignalForward
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
                     LockMethod(() => { Aoi1Message.Add(bytes); }, (Aoi1Message as ICollection).SyncRoot);
-
                 };
                 _localUdp.Start();
             }
@@ -344,7 +352,6 @@ namespace SignalForward
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
                     LockMethod1(() => { Aoi2Message.Add(bytes); }, (Aoi2Message as ICollection).SyncRoot);
-
                 };
                 _localUdp1.Start();
                 _timeout = ((int)numericUpDown1.Value);
@@ -703,7 +710,7 @@ namespace SignalForward
         //    }
         //}
 
-        #endregion
+        #endregion 旧成品
 
         #region 旧出版
 
@@ -1065,7 +1072,7 @@ namespace SignalForward
         //    }
         //}
 
-        #endregion 
+        #endregion 旧出版
 
         #region 成品
 
@@ -1076,6 +1083,7 @@ namespace SignalForward
         {
             while (true)
             {
+                _tokenSource1?.Token.ThrowIfCancellationRequested();
                 try
                 {
                     long timeOut;
@@ -1088,7 +1096,7 @@ namespace SignalForward
                     var complete = true;
                     //收到的消息
                     byte[] value = default;
-                    if (RemoteQueue == null || _plcIpEndPoint == null || RemoveQueue == null)
+                    if (RemoteQueue == null || _plcIpEndPoint == null || RemoveQueue == null || _localUdp == null || _localUdp1 == null)
                     {
                         continue;
                     }
@@ -1103,7 +1111,6 @@ namespace SignalForward
 
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
-
                                 //拍照中
                                 LockMethod(() =>
                                 {
@@ -1127,7 +1134,6 @@ namespace SignalForward
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
                                 }, (Aoi1Message as ICollection).SyncRoot);
-
 
                                 //拍照完成
                                 LockMethod(() =>
@@ -1190,7 +1196,6 @@ namespace SignalForward
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
-
                                 //拍照中
                                 LockMethod1(() =>
                                 {
@@ -1309,7 +1314,6 @@ namespace SignalForward
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
-
                                 }
 
                                 //拍照完成
@@ -1344,7 +1348,6 @@ namespace SignalForward
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
-
                                 }
 
                                 //检测完成
@@ -1383,7 +1386,6 @@ namespace SignalForward
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); }, (Aoi1Message as ICollection).SyncRoot);
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); }, (Aoi2Message as ICollection).SyncRoot);
-
                                 }
 
                                 var afterDt = DateTime.Now;
@@ -1404,7 +1406,7 @@ namespace SignalForward
             }
         }
 
-        #endregion
+        #endregion 成品
 
         #region 出版
 
@@ -1415,6 +1417,7 @@ namespace SignalForward
         {
             while (true)
             {
+                _tokenSource?.Token.ThrowIfCancellationRequested();
                 try
                 {
                     long timeOut;
@@ -1427,7 +1430,7 @@ namespace SignalForward
                     var complete = true;
                     //收到的消息
                     byte[] value = default;
-                    if (RemoteQueue == null || _plcIpEndPoint == null || RemoveQueue == null)
+                    if (RemoteQueue == null || _plcIpEndPoint == null || RemoveQueue == null || _localUdp == null || _localUdp1 == null)
                     {
                         continue;
                     }
@@ -1441,7 +1444,6 @@ namespace SignalForward
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
-
                                 //拍照中
                                 LockMethod(() =>
                                 {
@@ -1535,7 +1537,6 @@ namespace SignalForward
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
-
                                 //拍照中
                                 LockMethod1(() =>
                                 {
@@ -1665,7 +1666,6 @@ namespace SignalForward
                                     inPhoto = false;
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
-
                                 }
 
                                 //拍照完成
@@ -1697,7 +1697,6 @@ namespace SignalForward
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
-
                                 }
 
                                 //检测完成
@@ -1739,7 +1738,6 @@ namespace SignalForward
                                     complete = false;
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); }, (Aoi1Message as ICollection).SyncRoot);
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); }, (Aoi2Message as ICollection).SyncRoot);
-
                                 }
                                 var afterDt = DateTime.Now;
                                 var ts = afterDt.Subtract(beforeDt);
@@ -1759,7 +1757,7 @@ namespace SignalForward
             }
         }
 
-        #endregion
+        #endregion 出版
 
         /// <summary>
         /// 转发AOI发送的检测清除信号
@@ -1788,7 +1786,6 @@ namespace SignalForward
                             beforeDt = DateTime.Now;
                             while ((clear || complete) && timeOut < 200)
                             {
-
                                 //发送检测清空信号
                                 LockMethod(() =>
                                 {
@@ -1929,7 +1926,6 @@ namespace SignalForward
                                     clear = false;
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); }, (Aoi1Message as ICollection).SyncRoot);
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); }, (Aoi2Message as ICollection).SyncRoot);
-
                                 }
 
                                 //发送就绪信号
@@ -1958,7 +1954,6 @@ namespace SignalForward
                                     complete = false;
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); }, (Aoi1Message as ICollection).SyncRoot);
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); }, (Aoi2Message as ICollection).SyncRoot);
-
                                 }
 
                                 var afterDt = DateTime.Now;
@@ -2048,8 +2043,6 @@ namespace SignalForward
             }
             catch (Exception)
             {
-
-
             }
             finally { if (gotLock) spinLock.Exit(); }
         }
@@ -2069,12 +2062,9 @@ namespace SignalForward
             }
             catch (Exception)
             {
-
-
             }
             finally { if (gotLock) spinLock1.Exit(); }
         }
-
 
         /// <summary>
         /// 锁
@@ -2082,7 +2072,6 @@ namespace SignalForward
         /// <param name="action"></param>
         public void LockMethod(Action action, object stauts)
         {
-
             try
             {
                 lock (stauts)
@@ -2092,10 +2081,7 @@ namespace SignalForward
             }
             catch (Exception)
             {
-
-
             }
-
         }
 
         /// <summary>
@@ -2104,7 +2090,6 @@ namespace SignalForward
         /// <param name="action"></param>
         public void LockMethod1(Action action, object stauts)
         {
-
             try
             {
                 lock (stauts)
@@ -2114,10 +2099,41 @@ namespace SignalForward
             }
             catch (Exception)
             {
-
-
             }
+        }
 
+        private void CB_Click(object sender, EventArgs e)
+        {
+            CB.Enabled = false;
+            if (_tokenSource1 != null)
+            {
+                _tokenSource1.Cancel();
+                _tokenSource1.Dispose();
+                _tokenSource1 = null;
+            }
+            if (_tokenSource == null)
+            {
+                _tokenSource = new();
+            }
+            Task.Factory.StartNew(CbTransmit, _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            CP.Enabled = true;
+        }
+
+        private void CP_Click(object sender, EventArgs e)
+        {
+            CP.Enabled = false;
+            if (_tokenSource != null)
+            {
+                _tokenSource.Cancel();
+                _tokenSource.Dispose();
+                _tokenSource = null;
+            }
+            if (_tokenSource1 == null)
+            {
+                _tokenSource1 = new();
+            }
+            Task.Factory.StartNew(Transmit, _tokenSource1.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            CB.Enabled = true;
         }
     }
 }
