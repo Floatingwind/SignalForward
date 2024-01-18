@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Net;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SignalForward
 {
@@ -102,7 +104,7 @@ namespace SignalForward
             Aoi2Ip.DataBindings.Add("Enabled", button2, "Enabled");
             Aoi2Port.DataBindings.Add("Enabled", button2, "Enabled");
             numericUpDown1.DataBindings.Add("Enabled", button2, "Enabled");
-
+            InitParam();
             Task.Factory.StartNew(Remove, TaskCreationOptions.LongRunning);
         }
 
@@ -339,6 +341,7 @@ namespace SignalForward
         {
             try
             {
+                SaveJsonData();
                 if (CP.Checked)
                 {
                     CB.Enabled = false;
@@ -2156,6 +2159,88 @@ namespace SignalForward
             }
             Task.Factory.StartNew(Transmit, _tokenSource1.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             CB.Enabled = true;
+        }
+
+
+        private string JsonPath { get; set; } = "seting.Json";
+
+        private async void SaveJsonData()
+        {
+            var json = new JsonObject();
+            json.Add("CB", CB.Checked);
+            json.Add("CP", CP.Checked);
+            json.Add("numericUpDown1", numericUpDown1.Value);
+            json.Add("PlcIp", PlcIp.Text);
+            json.Add("PlcPort", PlcPort.Text);
+            json.Add("Plc_oneIp", Plc_oneIp.Text);
+            json.Add("Plc_onePort", Plc_onePort.Text);
+
+            json.Add("Aoi1_oneIp", Aoi1_oneIp.Text);
+            json.Add("Aoi_onePort", Aoi_onePort.Text);
+            json.Add("Aoi1Ip", Aoi1Ip.Text);
+            json.Add("Aoi1Port", Aoi1Port.Text);
+
+            json.Add("Aoi2_oneIp", Aoi2_oneIp.Text);
+            json.Add("Aoi2_onePort", Aoi2_onePort.Text);
+            json.Add("Aoi2Ip", Aoi2Ip.Text);
+            json.Add("Aoi2Port", Aoi2Port.Text);
+            if (File.Exists(this.JsonPath))
+            {
+                File.Delete(JsonPath);
+            }
+
+            // Create a file to write to.
+            using (FileStream FS = File.Create(JsonPath))
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                await JsonSerializer.SerializeAsync(FS, json, options);
+                await FS.FlushAsync();
+            }
+        }
+
+        private bool InitParam()
+        {
+            try
+            {
+                if (File.Exists(this.JsonPath))
+                {
+                    // 读取 配置文件
+                    var JSON_String = File.ReadAllText(JsonPath);
+                    // 将 读取到的内容 反序列化 为 JSON DOM 对象
+                    JsonNode JSON_Node = JsonNode.Parse(JSON_String)!;
+                    // 从 DOM 对象中取值并 赋给 控件
+                    if (JSON_Node!["CB"]!.GetValue<bool>())
+                    {
+                        CB.Checked = true;
+                    }
+                    if (JSON_Node!["CP"]!.GetValue<bool>())
+                    {
+                        CP.Checked = true;
+                    }
+                    numericUpDown1.Value = JSON_Node!["numericUpDown1"]!.GetValue<decimal>();
+                    PlcIp.Text = JSON_Node!["PlcIp"]!.GetValue<string>();
+                    PlcPort.Text = JSON_Node!["PlcPort"]!.GetValue<string>();
+                    Plc_oneIp.Text = JSON_Node!["Plc_oneIp"]!.GetValue<string>();
+                    Plc_onePort.Text = JSON_Node!["Plc_onePort"]!.GetValue<string>();
+
+                    Aoi1_oneIp.Text = JSON_Node!["Aoi1_oneIp"]!.GetValue<string>();
+                    Aoi_onePort.Text = JSON_Node!["Aoi_onePort"]!.GetValue<string>();
+                    Aoi1Ip.Text = JSON_Node!["Aoi1Ip"]!.GetValue<string>();
+                    Aoi1Port.Text = JSON_Node!["Aoi1Port"]!.GetValue<string>();
+
+                    Aoi2_oneIp.Text = JSON_Node!["Aoi2_oneIp"]!.GetValue<string>();
+                    Aoi2_onePort.Text = JSON_Node!["Aoi2_onePort"]!.GetValue<string>();
+                    Aoi2Ip.Text = JSON_Node!["Aoi2Ip"]!.GetValue<string>();
+                    Aoi2Port.Text = JSON_Node!["Aoi2Port"]!.GetValue<string>();
+
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }
