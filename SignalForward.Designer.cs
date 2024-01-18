@@ -489,7 +489,7 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(179, 373);
+            this.numericUpDown1.Location = new System.Drawing.Point(300, 18);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -507,7 +507,7 @@
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(15, 377);
+            this.label18.Location = new System.Drawing.Point(145, 22);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(149, 12);
             this.label18.TabIndex = 4;
@@ -540,6 +540,8 @@
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.CB);
+            this.groupBox4.Controls.Add(this.numericUpDown1);
+            this.groupBox4.Controls.Add(this.label18);
             this.groupBox4.Controls.Add(this.CP);
             this.groupBox4.Location = new System.Drawing.Point(14, 5);
             this.groupBox4.Name = "groupBox4";
@@ -554,8 +556,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(684, 489);
             this.Controls.Add(this.groupBox4);
-            this.Controls.Add(this.label18);
-            this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -572,7 +572,6 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 

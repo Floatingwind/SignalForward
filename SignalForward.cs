@@ -339,6 +339,20 @@ namespace SignalForward
         {
             try
             {
+                if (CP.Checked)
+                {
+                    CB.Enabled = false;
+                }
+                else if (CP.Checked == false && CB.Checked == false)
+                {
+                    MessageBox.Show("请选择通讯模式！");
+                    return;
+                }
+                else
+                {
+                    CP.Enabled = false;
+                }
+
                 if (Logger == null) return;
                 button2.Enabled = false;
                 button5.Enabled = true;
@@ -1109,7 +1123,7 @@ namespace SignalForward
                             timeOut = 0;
                             beforeDt = DateTime.Now;
 
-                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
                             {
                                 //拍照中
                                 LockMethod(() =>
@@ -1194,7 +1208,7 @@ namespace SignalForward
                             var destination2 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
                             {
                                 //拍照中
                                 LockMethod1(() =>
@@ -1279,7 +1293,7 @@ namespace SignalForward
                             var destination4 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
@@ -1442,7 +1456,7 @@ namespace SignalForward
                             var destination1 = value.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
                             {
                                 //拍照中
                                 LockMethod(() =>
@@ -1535,7 +1549,7 @@ namespace SignalForward
                             var destination2 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
                             {
                                 //拍照中
                                 LockMethod1(() =>
@@ -1627,7 +1641,7 @@ namespace SignalForward
                             var destination4 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
@@ -2014,6 +2028,14 @@ namespace SignalForward
         {
             try
             {
+                if (CB.Checked)
+                {
+                    CP.Enabled = true;
+                }
+                else
+                {
+                    CB.Enabled = true;
+                }
                 button5.Enabled = false;
                 button2.Enabled = true;
                 if (_localUdp1 == null) return;
