@@ -21,7 +21,7 @@ namespace SignalForward
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new SignalForward());
+                Application.Run(new SignalForwardTcp());
                 mutex.ReleaseMutex();
             }
             else

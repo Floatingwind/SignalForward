@@ -1,6 +1,6 @@
 ﻿namespace SignalForward
 {
-    partial class SignalForward
+    partial class SignalForwardUdp
     {
         /// <summary>
         ///  Required designer variable.

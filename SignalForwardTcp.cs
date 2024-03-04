@@ -6,14 +6,14 @@ using System.Text.Json.Nodes;
 
 namespace SignalForward
 {
-    public partial class SignalForward : Form
+    public partial class SignalForwardTcp : Form
     {
         public log4net.ILog? Logger;
 
         /// <summary>
         /// 远程Udp对象
         /// </summary>
-        private xxUDPSyncServer? _remoteUdp;
+        private UdpSyncServer? _remoteUdp;
 
         /// <summary>
         /// PLC
@@ -33,22 +33,22 @@ namespace SignalForward
         /// <summary>
         /// 本地连接
         /// </summary>
-        private xxUDPSyncServer? _localUdp;
+        private UdpSyncServer? _localUdp;
 
         /// <summary>
         /// 本地连接1
         /// </summary>
-        private xxUDPSyncServer? _localUdp1;
+        private UdpSyncServer? _localUdp1;
 
         /// <summary>
         /// 通讯信号
         /// </summary>
-        public WHCurrentQueue<byte[]>? RemoteQueue;
+        public WhCurrentQueue<byte[]>? RemoteQueue;
 
         /// <summary>
         /// 待删除的信号
         /// </summary>
-        public WHCurrentQueue<byte[]>? RemoveQueue;
+        public WhCurrentQueue<byte[]>? RemoveQueue;
 
         /// <summary>
         /// AOI1发送的消息
@@ -87,27 +87,27 @@ namespace SignalForward
 
         private static int _timeout;
 
-        public SignalForward()
+        public SignalForwardTcp()
         {
             Logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-            RemoteQueue = new WHCurrentQueue<byte[]>("等待发送结果", Logger);
-            RemoveQueue = new WHCurrentQueue<byte[]>("等待删除结果", Logger);
+            RemoteQueue = new WhCurrentQueue<byte[]>("等待发送结果", Logger);
+            RemoveQueue = new WhCurrentQueue<byte[]>("等待删除结果", Logger);
             InitializeComponent();
-            PlcIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
-            PlcPort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
-            Plc_oneIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
-            Plc_onePort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            tcpPlcIp.DataBindings.Add("Enabled", tcpRemoteBnt, "Enabled");
+            tcpPlcPort.DataBindings.Add("Enabled", tcpRemoteBnt, "Enabled");
+            tcpPlc_oneIp.DataBindings.Add("Enabled", tcpRemoteBnt, "Enabled");
+            tcpPlc_onePort.DataBindings.Add("Enabled", tcpRemoteBnt, "Enabled");
 
-            Aoi1_oneIp.DataBindings.Add("Enabled", button1, "Enabled");
-            Aoi_onePort.DataBindings.Add("Enabled", button1, "Enabled");
-            Aoi1Ip.DataBindings.Add("Enabled", button1, "Enabled");
-            Aoi1Port.DataBindings.Add("Enabled", button1, "Enabled");
+            tcpAoi1_oneIp.DataBindings.Add("Enabled", tcpButton1, "Enabled");
+            tcpAoi_onePort.DataBindings.Add("Enabled", tcpButton1, "Enabled");
+            tcpAoi1Ip.DataBindings.Add("Enabled", tcpButton1, "Enabled");
+            tcpAoi1Port.DataBindings.Add("Enabled", tcpButton1, "Enabled");
 
-            Aoi2_oneIp.DataBindings.Add("Enabled", button2, "Enabled");
-            Aoi2_onePort.DataBindings.Add("Enabled", button2, "Enabled");
-            Aoi2Ip.DataBindings.Add("Enabled", button2, "Enabled");
-            Aoi2Port.DataBindings.Add("Enabled", button2, "Enabled");
-            numericUpDown1.DataBindings.Add("Enabled", button2, "Enabled");
+            tcpAoi2_oneIp.DataBindings.Add("Enabled", tcpButton2, "Enabled");
+            tcpAoi2_onePort.DataBindings.Add("Enabled", tcpButton2, "Enabled");
+            tcpAoi2Ip.DataBindings.Add("Enabled", tcpButton2, "Enabled");
+            tcpAoi2Port.DataBindings.Add("Enabled", tcpButton2, "Enabled");
+            tcpNumericUpDown1.DataBindings.Add("Enabled", tcpButton2, "Enabled");
             InitParam();
             Task.Factory.StartNew(Remove, _tokenSource2.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
@@ -134,7 +134,7 @@ namespace SignalForward
                             while (control)
                             {
                                 IPEndPoint rEndPoint = default;
-                                byte[] buff = _localUdp._server.Receive(ref rEndPoint);
+                                byte[] buff = _localUdp.Server.Receive(ref rEndPoint);
                                 if (buff != default)
                                 {
                                     _remoteUdp.SendAsync(_plcIpEndPoint, buff);
@@ -155,7 +155,7 @@ namespace SignalForward
                             while (control)
                             {
                                 IPEndPoint rEndPoint = default;
-                                byte[] buff = _localUdp1._server.Receive(ref rEndPoint);
+                                byte[] buff = _localUdp1.Server.Receive(ref rEndPoint);
                                 if (buff != default)
                                 {
                                     _remoteUdp.SendAsync(_plcIpEndPoint, buff);
@@ -181,13 +181,13 @@ namespace SignalForward
                                 Task<byte[]> result = new Task<byte[]>((() =>
                                 {
                                     IPEndPoint ipEnd = default;
-                                    return _localUdp._server.Receive(ref ipEnd);
+                                    return _localUdp.Server.Receive(ref ipEnd);
                                 }));
                                 tasks.Add(result);
                                 Task<byte[]> result1 = new Task<byte[]>((() =>
                                 {
                                     IPEndPoint ipEnd = default;
-                                    return _localUdp1._server.Receive(ref ipEnd);
+                                    return _localUdp1.Server.Receive(ref ipEnd);
                                 }));
                                 tasks.Add(result1);
                                 result.Start();
@@ -221,11 +221,11 @@ namespace SignalForward
             {
                 if (Logger == null) return;
 
-                RemoteBnt.Enabled = false;
-                button3.Enabled = true;
-                _plcIpEndPoint = new IPEndPoint(IPAddress.Parse(PlcIp.Text.Trim()), int.Parse(PlcPort.Text.Trim()));
+                tcpRemoteBnt.Enabled = false;
+                tcpButton3.Enabled = true;
+                _plcIpEndPoint = new IPEndPoint(IPAddress.Parse(tcpPlcIp.Text.Trim()), int.Parse(tcpPlcPort.Text.Trim()));
 
-                _remoteUdp = new xxUDPSyncServer(IPAddress.Parse(Plc_oneIp.Text.Trim()), int.Parse(Plc_onePort.Text.Trim()), Logger);
+                _remoteUdp = new UdpSyncServer(IPAddress.Parse(tcpPlc_oneIp.Text.Trim()), int.Parse(tcpPlc_onePort.Text.Trim()), Logger);
                 _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
                 {
                     if (_localUdp == null || _localUdp1 == null) return;
@@ -285,7 +285,6 @@ namespace SignalForward
                             }
                             break;
 
-
                         default:
                             Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
                             Logger.Info(dataBytes);
@@ -297,8 +296,8 @@ namespace SignalForward
             }
             catch (Exception exception)
             {
-                RemoteBnt.Enabled = true;
-                button3.Enabled = false;
+                tcpRemoteBnt.Enabled = true;
+                tcpButton3.Enabled = false;
                 if (_remoteUdp != null)
                 {
                     _remoteUdp.Stop();
@@ -315,12 +314,12 @@ namespace SignalForward
             try
             {
                 if (Logger == null) return;
-                button1.Enabled = false;
-                button4.Enabled = true;
+                tcpButton1.Enabled = false;
+                tcpButton4.Enabled = true;
                 _aoi1PortEndPoint =
-                    new IPEndPoint(IPAddress.Parse(Aoi1Ip.Text.Trim()), int.Parse(Aoi1Port.Text.Trim()));
-                _localUdp = new xxUDPSyncServer(IPAddress.Parse(Aoi1_oneIp.Text.Trim()),
-                    int.Parse(Aoi_onePort.Text.Trim()), Logger);
+                    new IPEndPoint(IPAddress.Parse(tcpAoi1Ip.Text.Trim()), int.Parse(tcpAoi1Port.Text.Trim()));
+                _localUdp = new UdpSyncServer(IPAddress.Parse(tcpAoi1_oneIp.Text.Trim()),
+                    int.Parse(tcpAoi_onePort.Text.Trim()), Logger);
                 _localUdp.DataReceived += (o, bytes) =>
                 {
                     Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
@@ -332,8 +331,8 @@ namespace SignalForward
             }
             catch (Exception exception)
             {
-                button1.Enabled = true;
-                button4.Enabled = false;
+                tcpButton1.Enabled = true;
+                tcpButton4.Enabled = false;
                 if (_localUdp != null)
                 {
                     _localUdp.Stop();
@@ -350,27 +349,27 @@ namespace SignalForward
             try
             {
                 SaveJsonData();
-                if (CP.Checked)
+                if (tcpCP.Checked)
                 {
-                    CB.Enabled = false;
+                    tcpCB.Enabled = false;
                 }
-                else if (CP.Checked == false && CB.Checked == false)
+                else if (tcpCP.Checked == false && tcpCB.Checked == false)
                 {
                     MessageBox.Show("请选择通讯模式！");
                     return;
                 }
                 else
                 {
-                    CP.Enabled = false;
+                    tcpCP.Enabled = false;
                 }
 
                 if (Logger == null) return;
-                button2.Enabled = false;
-                button5.Enabled = true;
+                tcpButton2.Enabled = false;
+                tcpButton5.Enabled = true;
                 _aoi2PortEndPoint =
-                    new IPEndPoint(IPAddress.Parse(Aoi2Ip.Text.Trim()), int.Parse(Aoi2Port.Text.Trim()));
-                _localUdp1 = new xxUDPSyncServer(IPAddress.Parse(Aoi2_oneIp.Text.Trim()),
-                    int.Parse(Aoi2_onePort.Text.Trim()), Logger);
+                    new IPEndPoint(IPAddress.Parse(tcpAoi2Ip.Text.Trim()), int.Parse(tcpAoi2Port.Text.Trim()));
+                _localUdp1 = new UdpSyncServer(IPAddress.Parse(tcpAoi2_oneIp.Text.Trim()),
+                    int.Parse(tcpAoi2_onePort.Text.Trim()), Logger);
                 _localUdp1.DataReceived += (o, bytes) =>
                 {
                     Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI2消息:");
@@ -379,12 +378,12 @@ namespace SignalForward
                     LockMethod1(() => { Aoi2Message.Add(bytes); });
                 };
                 _localUdp1.Start();
-                _timeout = ((int)numericUpDown1.Value);
+                _timeout = ((int)tcpNumericUpDown1.Value);
             }
             catch (Exception exception)
             {
-                button2.Enabled = true;
-                button5.Enabled = false;
+                tcpButton2.Enabled = true;
+                tcpButton5.Enabled = false;
                 if (_localUdp1 != null)
                 {
                     _localUdp1.Stop();
@@ -2004,8 +2003,8 @@ namespace SignalForward
         {
             try
             {
-                button3.Enabled = false;
-                RemoteBnt.Enabled = true;
+                tcpButton3.Enabled = false;
+                tcpRemoteBnt.Enabled = true;
                 if (_remoteUdp == null) return;
                 _remoteUdp.Stop();
                 _remoteUdp.Dispose();
@@ -2022,8 +2021,8 @@ namespace SignalForward
         {
             try
             {
-                button4.Enabled = false;
-                button1.Enabled = true;
+                tcpButton4.Enabled = false;
+                tcpButton1.Enabled = true;
                 if (_localUdp == null) return;
                 _localUdp.Stop();
                 _localUdp.Dispose();
@@ -2040,16 +2039,16 @@ namespace SignalForward
         {
             try
             {
-                if (CB.Checked)
+                if (tcpCB.Checked)
                 {
-                    CP.Enabled = true;
+                    tcpCP.Enabled = true;
                 }
                 else
                 {
-                    CB.Enabled = true;
+                    tcpCB.Enabled = true;
                 }
-                button5.Enabled = false;
-                button2.Enabled = true;
+                tcpButton5.Enabled = false;
+                tcpButton2.Enabled = true;
                 if (_localUdp1 == null) return;
                 _localUdp1.Stop();
                 _localUdp1.Dispose();
@@ -2141,23 +2140,23 @@ namespace SignalForward
         private async void SaveJsonData()
         {
             var json = new JsonObject();
-            json.Add("CB", CB.Checked);
-            json.Add("CP", CP.Checked);
-            json.Add("numericUpDown1", numericUpDown1.Value);
-            json.Add("PlcIp", PlcIp.Text);
-            json.Add("PlcPort", PlcPort.Text);
-            json.Add("Plc_oneIp", Plc_oneIp.Text);
-            json.Add("Plc_onePort", Plc_onePort.Text);
+            json.Add("tcpCB", tcpCB.Checked);
+            json.Add("tcpCP", tcpCP.Checked);
+            json.Add("tcpNumericUpDown1", tcpNumericUpDown1.Value);
+            json.Add("tcpPlcIp", tcpPlcIp.Text);
+            json.Add("tcpPlcPort", tcpPlcPort.Text);
+            json.Add("tcpPlc_oneIp", tcpPlc_oneIp.Text);
+            json.Add("tcpPlc_onePort", tcpPlc_onePort.Text);
 
-            json.Add("Aoi1_oneIp", Aoi1_oneIp.Text);
-            json.Add("Aoi_onePort", Aoi_onePort.Text);
-            json.Add("Aoi1Ip", Aoi1Ip.Text);
-            json.Add("Aoi1Port", Aoi1Port.Text);
+            json.Add("tcpAoi1_oneIp", tcpAoi1_oneIp.Text);
+            json.Add("tcpAoi_onePort", tcpAoi_onePort.Text);
+            json.Add("tcpAoi1Ip", tcpAoi1Ip.Text);
+            json.Add("tcpAoi1Port", tcpAoi1Port.Text);
 
-            json.Add("Aoi2_oneIp", Aoi2_oneIp.Text);
-            json.Add("Aoi2_onePort", Aoi2_onePort.Text);
-            json.Add("Aoi2Ip", Aoi2Ip.Text);
-            json.Add("Aoi2Port", Aoi2Port.Text);
+            json.Add("tcpAoi2_oneIp", tcpAoi2_oneIp.Text);
+            json.Add("tcpAoi2_onePort", tcpAoi2_onePort.Text);
+            json.Add("tcpAoi2Ip", tcpAoi2Ip.Text);
+            json.Add("tcpAoi2Port", tcpAoi2Port.Text);
             if (File.Exists(this.JsonPath))
             {
                 File.Delete(JsonPath);
@@ -2179,34 +2178,33 @@ namespace SignalForward
                 if (File.Exists(this.JsonPath))
                 {
                     // 读取 配置文件
-                    var JSON_String = File.ReadAllText(JsonPath);
+                    var jsonString = File.ReadAllText(JsonPath);
                     // 将 读取到的内容 反序列化 为 JSON DOM 对象
-                    JsonNode JSON_Node = JsonNode.Parse(JSON_String)!;
+                    var jsonNode = JsonNode.Parse(jsonString)!;
                     // 从 DOM 对象中取值并 赋给 控件
-                    if (JSON_Node!["CB"]!.GetValue<bool>())
+                    if (jsonNode!["tcpCB"]!.GetValue<bool>())
                     {
-                        CB.Checked = true;
-
+                        tcpCB.Checked = true;
                     }
-                    if (JSON_Node!["CP"]!.GetValue<bool>())
+                    if (jsonNode!["tcpCP"]!.GetValue<bool>())
                     {
-                        CP.Checked = true;
+                        tcpCP.Checked = true;
                     }
-                    numericUpDown1.Value = JSON_Node!["numericUpDown1"]!.GetValue<decimal>();
-                    PlcIp.Text = JSON_Node!["PlcIp"]!.GetValue<string>();
-                    PlcPort.Text = JSON_Node!["PlcPort"]!.GetValue<string>();
-                    Plc_oneIp.Text = JSON_Node!["Plc_oneIp"]!.GetValue<string>();
-                    Plc_onePort.Text = JSON_Node!["Plc_onePort"]!.GetValue<string>();
+                    tcpNumericUpDown1.Value = jsonNode!["tcpNumericUpDown1"]!.GetValue<decimal>();
+                    tcpPlcIp.Text = jsonNode!["tcpPlcIp"]!.GetValue<string>();
+                    tcpPlcPort.Text = jsonNode!["tcpPlcPort"]!.GetValue<string>();
+                    tcpPlc_oneIp.Text = jsonNode!["tcpPlc_oneIp"]!.GetValue<string>();
+                    tcpPlc_onePort.Text = jsonNode!["tcpPlc_onePort"]!.GetValue<string>();
 
-                    Aoi1_oneIp.Text = JSON_Node!["Aoi1_oneIp"]!.GetValue<string>();
-                    Aoi_onePort.Text = JSON_Node!["Aoi_onePort"]!.GetValue<string>();
-                    Aoi1Ip.Text = JSON_Node!["Aoi1Ip"]!.GetValue<string>();
-                    Aoi1Port.Text = JSON_Node!["Aoi1Port"]!.GetValue<string>();
+                    tcpAoi1_oneIp.Text = jsonNode!["tcpAoi1_oneIp"]!.GetValue<string>();
+                    tcpAoi_onePort.Text = jsonNode!["tcpAoi_onePort"]!.GetValue<string>();
+                    tcpAoi1Ip.Text = jsonNode!["tcpAoi1Ip"]!.GetValue<string>();
+                    tcpAoi1Port.Text = jsonNode!["tcpAoi1Port"]!.GetValue<string>();
 
-                    Aoi2_oneIp.Text = JSON_Node!["Aoi2_oneIp"]!.GetValue<string>();
-                    Aoi2_onePort.Text = JSON_Node!["Aoi2_onePort"]!.GetValue<string>();
-                    Aoi2Ip.Text = JSON_Node!["Aoi2Ip"]!.GetValue<string>();
-                    Aoi2Port.Text = JSON_Node!["Aoi2Port"]!.GetValue<string>();
+                    tcpAoi2_oneIp.Text = jsonNode!["tcpAoi2_oneIp"]!.GetValue<string>();
+                    tcpAoi2_onePort.Text = jsonNode!["tcpAoi2_onePort"]!.GetValue<string>();
+                    tcpAoi2Ip.Text = jsonNode!["tcpAoi2Ip"]!.GetValue<string>();
+                    tcpAoi2Port.Text = jsonNode!["tcpAoi2Port"]!.GetValue<string>();
 
                     return true;
                 }
@@ -2220,9 +2218,9 @@ namespace SignalForward
 
         private void CB_CheckedChanged(object sender, EventArgs e)
         {
-            if (CB.Checked)
+            if (tcpCB.Checked)
             {
-                CB.Enabled = false;
+                tcpCB.Enabled = false;
                 if (_tokenSource1 != null)
                 {
                     _tokenSource1.Cancel();
@@ -2234,28 +2232,26 @@ namespace SignalForward
                     _tokenSource = new();
                 }
                 Task.Factory.StartNew(CbTransmit, _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-                CP.Enabled = true;
+                tcpCP.Enabled = true;
             }
         }
 
         private void CP_CheckedChanged(object sender, EventArgs e)
         {
-            if (CP.Checked)
+            if (!tcpCP.Checked) return;
+            tcpCP.Enabled = false;
+            if (_tokenSource != null)
             {
-                CP.Enabled = false;
-                if (_tokenSource != null)
-                {
-                    _tokenSource.Cancel();
-                    _tokenSource.Dispose();
-                    _tokenSource = null;
-                }
-                if (_tokenSource1 == null)
-                {
-                    _tokenSource1 = new();
-                }
-                Task.Factory.StartNew(Transmit, _tokenSource1.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-                CB.Enabled = true;
+                _tokenSource.Cancel();
+                _tokenSource.Dispose();
+                _tokenSource = null;
             }
+            if (_tokenSource1 == null)
+            {
+                _tokenSource1 = new();
+            }
+            Task.Factory.StartNew(Transmit, _tokenSource1.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            tcpCB.Enabled = true;
         }
 
         private void SignalForward_FormClosing(object sender, FormClosingEventArgs e)
@@ -2270,11 +2266,10 @@ namespace SignalForward
                 _tokenSource1.Cancel();
                 _tokenSource1.Dispose();
             }
-            if (_tokenSource2 != null)
-            {
-                _tokenSource2.Cancel();
-                _tokenSource2.Dispose();
-            }
+
+            if (_tokenSource2 == null) return;
+            _tokenSource2.Cancel();
+            _tokenSource2.Dispose();
         }
     }
 }

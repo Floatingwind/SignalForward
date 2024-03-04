@@ -9,14 +9,14 @@ namespace SignalForward.UDP
     /// <summary>
     ///  同步的UDP Server
     /// </summary>
-    public class xxUDPSyncServer
+    public class UdpSyncServer : IDisposable
     {
         /// <summary>
         /// 服务器使用的异步UdpClient
         /// </summary>
-        public UdpClient _server;
+        public UdpClient Server;
 
-        private bool disposed = false;
+        private bool _disposed = false;
 
         public int ReceiveBufferSize { get; set; } = 128;
 
@@ -42,7 +42,7 @@ namespace SignalForward.UDP
 
         public string Name { get; set; }
 
-        private AsyncUDPState udpReceiveState = null;
+        private AsyncUDPState? _udpReceiveState = default;
 
         private ILog? _logger;
 
@@ -52,15 +52,15 @@ namespace SignalForward.UDP
         /// <param name="localIPAddress">监听的IP地址</param>
         /// <param name="listenPort">监听的端口</param>
         /// <param name="maxClient">最大客户端数量</param>
-        public xxUDPSyncServer(IPAddress localIPAddress, int listenPort, ILog logger)
+        public UdpSyncServer(IPAddress localIpAddress, int listenPort, ILog logger)
         {
-            this.Address = localIPAddress;
+            this.Address = localIpAddress;
             this.Port = listenPort;
             this.Encoding = Encoding.Default;
             _logger = logger;
             //_clients = new List<AsyncUDPSocketState>();
-            _server = new UdpClient(new IPEndPoint(this.Address, this.Port));
-            _server.Client.ReceiveBufferSize = ReceiveBufferSize;
+            Server = new UdpClient(new IPEndPoint(this.Address, this.Port));
+            Server.Client.ReceiveBufferSize = ReceiveBufferSize;
         }
 
         /// <summary>
@@ -69,12 +69,10 @@ namespace SignalForward.UDP
         /// <returns>异步TCP服务器</returns>
         public void Start()
         {
-            if (!IsRunning)
-            {
-                IsRunning = true;
-                _server.EnableBroadcast = false;
-                _server.BeginReceive(ReceiveDataAsync, udpReceiveState);
-            }
+            if (IsRunning) return;
+            IsRunning = true;
+            Server.EnableBroadcast = false;
+            Server.BeginReceive(ReceiveDataAsync, _udpReceiveState);
         }
 
         /// <summary>
@@ -83,30 +81,29 @@ namespace SignalForward.UDP
         /// <param name="ar"></param>
         private void ReceiveDataAsync(IAsyncResult ar)
         {
-            AsyncUDPState udpState = ar.AsyncState as AsyncUDPState;
-            IPEndPoint remote = null;
-            byte[] buffer = null;
+            AsyncUDPState? udpState = ar.AsyncState as AsyncUDPState;
+            IPEndPoint? remote = default;
+            byte[]? buffer = null;
             try
             {
-                if (ar.IsCompleted)
-                {
-                    buffer = _server.EndReceive(ar, ref remote);
+                if (!ar.IsCompleted) return;
+                buffer = Server.EndReceive(ar, ref remote);
 
-                    //触发数据收到事件
-                    RaiseDataReceived(buffer);
-                }
+                //触发数据收到事件
+                RaiseDataReceived(buffer);
             }
             catch (Exception exception)
             {
+                // ignored
             }
             finally
             {
                 lock (this)
                 {
-                    if (IsRunning && _server != null)
+                    if (IsRunning && Server != null)
                     {
-                        udpReceiveState = new AsyncUDPState();
-                        _server.BeginReceive(ReceiveDataAsync, udpReceiveState);
+                        _udpReceiveState = new AsyncUDPState();
+                        Server.BeginReceive(ReceiveDataAsync, _udpReceiveState);
                     }
                 }
             }
@@ -127,11 +124,9 @@ namespace SignalForward.UDP
         /// </summary>
         public void Stop()
         {
-            if (IsRunning)
-            {
-                IsRunning = false;
-                _server.Close();
-            }
+            if (!IsRunning) return;
+            IsRunning = false;
+            Server.Close();
         }
 
         /// <summary>
@@ -143,7 +138,7 @@ namespace SignalForward.UDP
         {
             try
             {
-                _server.Send(bits, bits.Length, remote);
+                Server.Send(bits, bits.Length, remote);
             }
             catch (Exception e)
             {
@@ -160,7 +155,7 @@ namespace SignalForward.UDP
         {
             try
             {
-                _server.BeginSend(bits, bits.Length, remote, new AsyncCallback(SendCallback), udpReceiveState);
+                Server.BeginSend(bits, bits.Length, remote, new AsyncCallback(SendCallback), _udpReceiveState);
             }
             catch (Exception e)
             {
@@ -171,18 +166,16 @@ namespace SignalForward.UDP
         private void SendCallback(IAsyncResult ar)
         {
             //AsyncUDPState state = ar.AsyncState as AsyncUDPState;
-            if (ar.IsCompleted)
+            if (!ar.IsCompleted) return;
+            try
             {
-                try
-                {
-                    _server.EndSend(ar);
-                    //消息发送完毕事件
-                    // Logger.Info("fa");
-                }
-                catch (Exception e)
-                {
-                    _logger?.Error("结束异步发送消息失败:" + e.Message, e);
-                }
+                Server.EndSend(ar);
+                //消息发送完毕事件
+                // Logger.Info("fa");
+            }
+            catch (Exception e)
+            {
+                _logger?.Error("结束异步发送消息失败:" + e.Message, e);
             }
         }
 
@@ -206,30 +199,28 @@ namespace SignalForward.UDP
         /// to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (this._disposed) return;
+            if (disposing)
             {
-                if (disposing)
+                try
                 {
-                    try
+                    Stop();
+                    if (Server != null)
                     {
-                        Stop();
-                        if (_server != null)
-                        {
-                            _server = null;
-                        }
-                    }
-                    catch (SocketException e)
-                    {
+                        Server = null;
                     }
                 }
-                disposed = true;
+                catch (SocketException e)
+                {
+                }
             }
+            _disposed = true;
         }
 
         #endregion 释放
     }
 
-    public class WHCurrentQueue<T>
+    public class WhCurrentQueue<T>
     {
         private ConcurrentQueue<T> _queue = new ConcurrentQueue<T>();
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(0, 1000);
@@ -237,7 +228,7 @@ namespace SignalForward.UDP
         public ILog Logger;
         public int Count => _queue.Count;
 
-        public WHCurrentQueue(string name, ILog logger)
+        public WhCurrentQueue(string name, ILog logger)
         {
             this.Name = name;
             Logger = logger;
@@ -251,7 +242,7 @@ namespace SignalForward.UDP
         {
             semaphore.Wait();
             _queue.TryDequeue(out obj);
-            int count = _queue.Count;
+            var count = _queue.Count;
             Logger?.Info($"{$"[{Name}]",-10}{"队列出队成功！",-18}剩余 {count}");
         }
 
@@ -261,7 +252,7 @@ namespace SignalForward.UDP
         /// <param name="obj"></param>
         public void Enqueue(T obj)
         {
-            int count = _queue.Count + 1;
+            var count = _queue.Count + 1;
             _queue.Enqueue(obj);
             semaphore.Release(1);
             Logger?.Info($"{$"[{Name}]",-10}{"队列入队成功！",-18}剩余 {count}");
