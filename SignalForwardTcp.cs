@@ -2506,80 +2506,75 @@ namespace SignalForward
             }
         }
 
-        private string JsonPath { get; set; } = "seting.Json";
+        private string JsonPath { get; set; } = "setingTcp.Json";
 
         private async void SaveJsonData()
         {
-            var json = new JsonObject();
-            json.Add("tcpCB", tcpCB.Checked);
-            json.Add("tcpCP", tcpCP.Checked);
-            json.Add("tcpNumericUpDown1", tcpNumericUpDown1.Value);
-            json.Add("tcpPlcIp", tcpPlcIp.Text);
-            json.Add("tcpPlcPort", tcpPlcPort.Text);
-            json.Add("tcpPlc_oneIp", tcpPlc_oneIp.Text);
-            json.Add("tcpPlc_onePort", tcpPlc_onePort.Text);
-
-            json.Add("tcpAoi1_oneIp", tcpAoi1_oneIp.Text);
-            json.Add("tcpAoi_onePort", tcpAoi_onePort.Text);
-            json.Add("tcpAoi1Ip", tcpAoi1Ip.Text);
-            json.Add("tcpAoi1Port", tcpAoi1Port.Text);
-
-            json.Add("tcpAoi2_oneIp", tcpAoi2_oneIp.Text);
-            json.Add("tcpAoi2_onePort", tcpAoi2_onePort.Text);
-            json.Add("tcpAoi2Ip", tcpAoi2Ip.Text);
-            json.Add("tcpAoi2Port", tcpAoi2Port.Text);
+            var json = new JsonObject
+            {
+                { "tcpCB", tcpCB.Checked },
+                { "tcpCP", tcpCP.Checked },
+                { "tcpNumericUpDown1", tcpNumericUpDown1.Value },
+                { "tcpPlcIp", tcpPlcIp.Text },
+                { "tcpPlcPort", tcpPlcPort.Text },
+                { "tcpPlc_oneIp", tcpPlc_oneIp.Text },
+                { "tcpPlc_onePort", tcpPlc_onePort.Text },
+                { "tcpAoi1_oneIp", tcpAoi1_oneIp.Text },
+                { "tcpAoi_onePort", tcpAoi_onePort.Text },
+                { "tcpAoi1Ip", tcpAoi1Ip.Text },
+                { "tcpAoi1Port", tcpAoi1Port.Text },
+                { "tcpAoi2_oneIp", tcpAoi2_oneIp.Text },
+                { "tcpAoi2_onePort", tcpAoi2_onePort.Text },
+                { "tcpAoi2Ip", tcpAoi2Ip.Text },
+                { "tcpAoi2Port", tcpAoi2Port.Text }
+            };
             if (File.Exists(this.JsonPath))
             {
                 File.Delete(JsonPath);
             }
 
             // Create a file to write to.
-            using (FileStream FS = File.Create(JsonPath))
-            {
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                await JsonSerializer.SerializeAsync(FS, json, options);
-                await FS.FlushAsync();
-            }
+            using var FS = File.Create(JsonPath);
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            await JsonSerializer.SerializeAsync(FS, json, options);
+            await FS.FlushAsync();
         }
 
         private bool InitParam()
         {
             try
             {
-                if (File.Exists(this.JsonPath))
+                if (!File.Exists(this.JsonPath)) return false;
+                // 读取 配置文件
+                var jsonString = File.ReadAllText(JsonPath);
+                // 将 读取到的内容 反序列化 为 JSON DOM 对象
+                var jsonNode = JsonNode.Parse(jsonString)!;
+                // 从 DOM 对象中取值并 赋给 控件
+                if (jsonNode!["tcpCB"]!.GetValue<bool>())
                 {
-                    // 读取 配置文件
-                    var jsonString = File.ReadAllText(JsonPath);
-                    // 将 读取到的内容 反序列化 为 JSON DOM 对象
-                    var jsonNode = JsonNode.Parse(jsonString)!;
-                    // 从 DOM 对象中取值并 赋给 控件
-                    if (jsonNode!["tcpCB"]!.GetValue<bool>())
-                    {
-                        tcpCB.Checked = true;
-                    }
-                    if (jsonNode!["tcpCP"]!.GetValue<bool>())
-                    {
-                        tcpCP.Checked = true;
-                    }
-                    tcpNumericUpDown1.Value = jsonNode!["tcpNumericUpDown1"]!.GetValue<decimal>();
-                    tcpPlcIp.Text = jsonNode!["tcpPlcIp"]!.GetValue<string>();
-                    tcpPlcPort.Text = jsonNode!["tcpPlcPort"]!.GetValue<string>();
-                    tcpPlc_oneIp.Text = jsonNode!["tcpPlc_oneIp"]!.GetValue<string>();
-                    tcpPlc_onePort.Text = jsonNode!["tcpPlc_onePort"]!.GetValue<string>();
-
-                    tcpAoi1_oneIp.Text = jsonNode!["tcpAoi1_oneIp"]!.GetValue<string>();
-                    tcpAoi_onePort.Text = jsonNode!["tcpAoi_onePort"]!.GetValue<string>();
-                    tcpAoi1Ip.Text = jsonNode!["tcpAoi1Ip"]!.GetValue<string>();
-                    tcpAoi1Port.Text = jsonNode!["tcpAoi1Port"]!.GetValue<string>();
-
-                    tcpAoi2_oneIp.Text = jsonNode!["tcpAoi2_oneIp"]!.GetValue<string>();
-                    tcpAoi2_onePort.Text = jsonNode!["tcpAoi2_onePort"]!.GetValue<string>();
-                    tcpAoi2Ip.Text = jsonNode!["tcpAoi2Ip"]!.GetValue<string>();
-                    tcpAoi2Port.Text = jsonNode!["tcpAoi2Port"]!.GetValue<string>();
-
-                    return true;
+                    tcpCB.Checked = true;
                 }
-                return false;
+                if (jsonNode!["tcpCP"]!.GetValue<bool>())
+                {
+                    tcpCP.Checked = true;
+                }
+                tcpNumericUpDown1.Value = jsonNode!["tcpNumericUpDown1"]!.GetValue<decimal>();
+                tcpPlcIp.Text = jsonNode!["tcpPlcIp"]!.GetValue<string>();
+                tcpPlcPort.Text = jsonNode!["tcpPlcPort"]!.GetValue<string>();
+                tcpPlc_oneIp.Text = jsonNode!["tcpPlc_oneIp"]!.GetValue<string>();
+                tcpPlc_onePort.Text = jsonNode!["tcpPlc_onePort"]!.GetValue<string>();
+
+                tcpAoi1_oneIp.Text = jsonNode!["tcpAoi1_oneIp"]!.GetValue<string>();
+                tcpAoi_onePort.Text = jsonNode!["tcpAoi_onePort"]!.GetValue<string>();
+                tcpAoi1Ip.Text = jsonNode!["tcpAoi1Ip"]!.GetValue<string>();
+                tcpAoi1Port.Text = jsonNode!["tcpAoi1Port"]!.GetValue<string>();
+
+                tcpAoi2_oneIp.Text = jsonNode!["tcpAoi2_oneIp"]!.GetValue<string>();
+                tcpAoi2_onePort.Text = jsonNode!["tcpAoi2_onePort"]!.GetValue<string>();
+                tcpAoi2Ip.Text = jsonNode!["tcpAoi2Ip"]!.GetValue<string>();
+                tcpAoi2Port.Text = jsonNode!["tcpAoi2Port"]!.GetValue<string>();
+
+                return true;
             }
             catch (Exception)
             {
@@ -2589,22 +2584,17 @@ namespace SignalForward
 
         private void CB_CheckedChanged(object sender, EventArgs e)
         {
-            if (tcpCB.Checked)
+            if (!tcpCB.Checked) return;
+            tcpCB.Enabled = false;
+            if (_tokenSource1 != null)
             {
-                tcpCB.Enabled = false;
-                if (_tokenSource1 != null)
-                {
-                    _tokenSource1.Cancel();
-                    _tokenSource1.Dispose();
-                    _tokenSource1 = null;
-                }
-                if (_tokenSource == null)
-                {
-                    _tokenSource = new();
-                }
-                Task.Factory.StartNew(Transmit1, _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-                tcpCP.Enabled = true;
+                _tokenSource1.Cancel();
+                _tokenSource1.Dispose();
+                _tokenSource1 = null;
             }
+            _tokenSource ??= new();
+            Task.Factory.StartNew(Transmit1, _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            tcpCP.Enabled = true;
         }
 
         private void CP_CheckedChanged(object sender, EventArgs e)
@@ -2617,10 +2607,7 @@ namespace SignalForward
                 _tokenSource.Dispose();
                 _tokenSource = null;
             }
-            if (_tokenSource1 == null)
-            {
-                _tokenSource1 = new();
-            }
+            _tokenSource1 ??= new();
             Task.Factory.StartNew(Transmit, _tokenSource1.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             tcpCB.Enabled = true;
         }

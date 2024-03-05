@@ -2135,7 +2135,7 @@ namespace SignalForward
             }
         }
 
-        private string JsonPath { get; set; } = "seting.Json";
+        private string JsonPath { get; set; } = "setingUdp.Json";
 
         private async void SaveJsonData()
         {
