@@ -128,7 +128,7 @@
             this.tcpPlc.AutoSize = true;
             this.tcpPlc.Location = new System.Drawing.Point(28, 29);
             this.tcpPlc.Name = "tcpPlc";
-            this.tcpPlc.Size = new System.Drawing.Size(23, 12);
+            this.tcpPlc.Size = new System.Drawing.Size(41, 12);
             this.tcpPlc.TabIndex = 9;
             this.tcpPlc.Text = "tcpPlc";
             // 
@@ -521,7 +521,7 @@
             this.tcpCB.Size = new System.Drawing.Size(47, 16);
             this.tcpCB.TabIndex = 5;
             this.tcpCB.TabStop = true;
-            this.tcpCB.Text = "出版";
+            this.tcpCB.Text = "背检";
             this.tcpCB.UseVisualStyleBackColor = true;
             this.tcpCB.CheckedChanged += new System.EventHandler(this.CB_CheckedChanged);
             // 
@@ -533,7 +533,7 @@
             this.tcpCP.Size = new System.Drawing.Size(47, 16);
             this.tcpCP.TabIndex = 6;
             this.tcpCP.TabStop = true;
-            this.tcpCP.Text = "成品";
+            this.tcpCP.Text = "正检";
             this.tcpCP.UseVisualStyleBackColor = true;
             this.tcpCP.CheckedChanged += new System.EventHandler(this.CP_CheckedChanged);
             // 
@@ -550,7 +550,7 @@
             this.tcpGroupBox4.TabStop = false;
             this.tcpGroupBox4.Text = "模式";
             // 
-            // SignalForward
+            // SignalForwardTcp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -560,7 +560,7 @@
             this.Controls.Add(this.tcpGroupBox2);
             this.Controls.Add(this.tcpGroupBox1);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Name = "SignalForward";
+            this.Name = "SignalForwardTcp";
             this.Text = "SignalForward";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SignalForward_FormClosing);
             this.tcpGroupBox1.ResumeLayout(false);

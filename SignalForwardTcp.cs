@@ -2602,7 +2602,7 @@ namespace SignalForward
                 {
                     _tokenSource = new();
                 }
-                Task.Factory.StartNew(CbTransmit, _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                Task.Factory.StartNew(Transmit1, _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
                 tcpCP.Enabled = true;
             }
         }
