@@ -172,13 +172,19 @@ namespace SignalForward.TCP
             _client.GetStream().Write(data, 0, data.Length);
         }
 
-        public void Write(string data)
+        public void WriteAsync(byte[] data)
+        {
+            if (_client == null) { throw new Exception("Cannot send data to a null TcpClient (check to see if Connect was called)"); }
+            _client.GetStream().WriteAsync(data, 0, data.Length);
+        }
+
+        public void Write(string? data)
         {
             if (data == null) { return; }
             Write(StringEncoder.GetBytes(data));
         }
 
-        public void WriteLine(string data)
+        public void WriteLine(string? data)
         {
             if (string.IsNullOrEmpty(data)) { return; }
             if (data.LastOrDefault() != Delimiter)
