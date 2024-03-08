@@ -5,41 +5,38 @@ namespace SignalForward.TCP
     public class Message
     {
         private TcpClient _tcpClient;
-        private System.Text.Encoding? _encoder;
+        private System.Text.Encoding _encoder;
         private byte _writeLineDelimiter;
-        private bool _autoTrim = false;
+        private bool _autoTrim;
 
         internal Message(byte[] data, TcpClient tcpClient, System.Text.Encoding stringEncoder, byte lineDelimiter)
         {
+            _autoTrim = false;
             Data = data;
-            _tcpClient = tcpClient;
-            _encoder = stringEncoder;
+            _tcpClient = tcpClient ?? throw new ArgumentNullException(nameof(tcpClient));
+            _encoder = stringEncoder ?? throw new ArgumentNullException(nameof(stringEncoder));
             _writeLineDelimiter = lineDelimiter;
         }
 
         internal Message(byte[] data, TcpClient tcpClient, System.Text.Encoding stringEncoder, byte lineDelimiter, bool autoTrim)
         {
+            _autoTrim = false;
             Data = data;
-            _tcpClient = tcpClient;
-            _encoder = stringEncoder;
+            _tcpClient = tcpClient ?? throw new ArgumentNullException(nameof(tcpClient));
+            _encoder = stringEncoder ?? throw new ArgumentNullException(nameof(stringEncoder));
             _writeLineDelimiter = lineDelimiter;
             _autoTrim = autoTrim;
         }
 
+        /// <summary>
+        /// 原始接收的字节数组
+        /// </summary>
         public byte[] Data { get; private set; }
 
-        public string MessageString
-        {
-            get
-            {
-                if (_autoTrim)
-                {
-                    return _encoder.GetString(Data).Trim();
-                }
-
-                return _encoder.GetString(Data);
-            }
-        }
+        /// <summary>
+        /// 接收的字符串
+        /// </summary>
+        public string MessageString => _autoTrim ? _encoder.GetString(Data).Trim() : _encoder.GetString(Data);
 
         public void Reply(byte[] data)
         {
@@ -57,7 +54,7 @@ namespace SignalForward.TCP
             if (string.IsNullOrEmpty(data)) { return; }
             if (data.LastOrDefault() != _writeLineDelimiter)
             {
-                Reply(data + _encoder.GetString(new byte[] { _writeLineDelimiter }));
+                Reply(data + _encoder.GetString(new[] { _writeLineDelimiter }));
             }
             else
             {
@@ -65,7 +62,6 @@ namespace SignalForward.TCP
             }
         }
 
-        public TcpClient TcpClient
-        { get { return _tcpClient; } }
+        public TcpClient TcpClient => _tcpClient;
     }
 }

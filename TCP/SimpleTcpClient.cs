@@ -189,7 +189,7 @@ namespace SignalForward.TCP
             if (string.IsNullOrEmpty(data)) { return; }
             if (data.LastOrDefault() != Delimiter)
             {
-                Write(data + StringEncoder.GetString(new byte[] { Delimiter }));
+                Write(data + StringEncoder.GetString(new[] { Delimiter }));
             }
             else
             {
@@ -219,7 +219,11 @@ namespace SignalForward.TCP
                     {
                         _client.Close();
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
+
                     _client = null;
                 }
 
