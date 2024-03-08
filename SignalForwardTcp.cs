@@ -295,9 +295,6 @@ namespace SignalForward
                         RemoteQueue?.Enqueue(message.Data);
                     }
 
-
-
-
                     //switch (message.Data[2])
                     //{
                     //    case 1:
@@ -466,7 +463,6 @@ namespace SignalForward
                 MessageBox.Show(exception.Message);
             }
         }
-
 
         #region 正检
 
@@ -1135,7 +1131,6 @@ namespace SignalForward
         }
 
         #endregion 背检
-
 
         /// <summary>
         /// 转发AOI发送的检测清除信号
