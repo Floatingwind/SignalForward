@@ -66,12 +66,12 @@ namespace SignalForward
         /// <summary>
         /// 自旋锁
         /// </summary>
-        public SpinLock spinLock = new();
+        public SpinLock SpinLock = new();
 
         /// <summary>
         /// 自旋锁1
         /// </summary>
-        public SpinLock spinLock1 = new();
+        public SpinLock SpinLock1 = new();
 
         /// <summary>
         ///  令牌
@@ -1420,13 +1420,13 @@ namespace SignalForward
             try
             {
                 gotLock = false;
-                spinLock.Enter(ref gotLock);
+                SpinLock.Enter(ref gotLock);
                 action();
             }
             catch (Exception)
             {
             }
-            finally { if (gotLock) spinLock.Exit(); }
+            finally { if (gotLock) SpinLock.Exit(); }
         }
 
         /// <summary>
@@ -1439,13 +1439,13 @@ namespace SignalForward
             try
             {
                 gotLock = false;
-                spinLock1.Enter(ref gotLock);
+                SpinLock1.Enter(ref gotLock);
                 action();
             }
             catch (Exception)
             {
             }
-            finally { if (gotLock) spinLock1.Exit(); }
+            finally { if (gotLock) SpinLock1.Exit(); }
         }
 
         /// <summary>
@@ -1512,10 +1512,10 @@ namespace SignalForward
             }
 
             // Create a file to write to.
-            using var FS = File.Create(JsonPath);
+            await using var fs = File.Create(JsonPath);
             var options = new JsonSerializerOptions { WriteIndented = true };
-            await JsonSerializer.SerializeAsync(FS, json, options);
-            await FS.FlushAsync();
+            await JsonSerializer.SerializeAsync(fs, json, options);
+            await fs.FlushAsync();
         }
 
         private bool InitParam()
@@ -1585,7 +1585,7 @@ namespace SignalForward
                 _tokenSource.Dispose();
                 _tokenSource = null;
             }
-            _tokenSource1 ??= new();
+            _tokenSource1 ??= new CancellationTokenSource();
             Task.Factory.StartNew(Transmit, _tokenSource1.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             tcpCB.Enabled = true;
         }
