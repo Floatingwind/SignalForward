@@ -275,7 +275,7 @@ namespace SignalForward
                     {
                         var newBytes = new byte[message.Data.Length];
                         newBytes[3] = 1;
-                        newBytes[30] = 1;
+                        //newBytes[30] = 1;
                         var data = message.Data.Skip(34).Take(10).ToArray();
                         for (var i = 0; i < data.Length; i++)
                         {
@@ -283,7 +283,7 @@ namespace SignalForward
                         }
                         var newBytes1 = new byte[message.Data.Length];
                         newBytes1[3] = 1;
-                        newBytes1[30] = 2;
+                        //newBytes1[30] = 2;
                         var data1 = message.Data.Skip(84).Take(10).ToArray();
                         for (var i = 0; i < data1.Length; i++)
                         {
@@ -875,6 +875,30 @@ namespace SignalForward
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
                                 });
+                                //外观
+                                LockMethod(() =>
+                                {
+                                    var c = Aoi1Message.Find(item =>
+                                        item[2] == 3 && item.Skip(34).Take(10).ToArray()
+                                            .SequenceEqual(destination1)
+                                    );
+                                    if (c != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+
+                                        re[1] = 4;
+
+                                        re[49] = c[9];
+                                        //re[51] = c[10];
+                                        _remoteTcp?.WriteAsync(re);
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        complete = false;
+                                        Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
+                                    }
+                                });
 
                                 //检测完成
                                 LockMethod(() =>
@@ -958,6 +982,32 @@ namespace SignalForward
                                     }
                                 });
 
+                                //外观
+                                LockMethod1(() =>
+                                {
+                                    var c = Aoi2Message.Find(item =>
+                                        item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
+                                            .SequenceEqual(destination2)
+                                    );
+                                    if (c != null)
+                                    {
+                                        var re = new byte[value.Length];
+                                        Array.Copy(value, re, value.Length);
+
+                                        re[1] = 4;
+
+                                        re[99] = c[9];
+                                        //re[101] = c[10];
+                                        _remoteTcp?.Write(re);
+
+                                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                        Logger?.Info(re);
+                                        Logger?.Info("-------------------------");
+                                        complete = false;
+                                        Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
+                                    }
+                                });
+
                                 //检测完成
                                 LockMethod1(() =>
                                 {
@@ -1004,7 +1054,8 @@ namespace SignalForward
                                 byte[] b1 = default;
                                 byte[] c = default;
                                 byte[] c1 = default;
-
+                                byte[] d = default;
+                                byte[] d1 = default;
                                 //拍照中
                                 LockMethod(() =>
                                 {
@@ -1064,6 +1115,44 @@ namespace SignalForward
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(b1)); });
+                                }
+
+                                //外观
+                                LockMethod(() =>
+                                {
+                                    d = Aoi1Message.Find(item =>
+                                        item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
+                                            .SequenceEqual(destination3)
+                                    );
+                                });
+
+                                LockMethod1(() =>
+                                {
+                                    d1 = Aoi2Message.Find(item =>
+                                        item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
+                                            .SequenceEqual(destination4)
+                                    );
+                                });
+
+                                if (d != null && d1 != null)
+                                {
+                                    var re = new byte[value.Length];
+                                    Array.Copy(value, re, value.Length);
+                                    //re[0] = 1;
+                                    re[1] = 4;
+                                    re[49] = c[9];
+                                    //re[51] = c[10];
+                                    re[99] = c1[9];
+                                    //re[101] = c1[10];
+                                    _remoteTcp?.Write(re);
+
+                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info(re);
+                                    Logger?.Info("-------------------------");
+                                    complete = false;
+
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); });
                                 }
 
                                 //检测完成
