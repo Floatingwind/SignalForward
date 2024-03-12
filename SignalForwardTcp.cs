@@ -2,7 +2,6 @@
 using SignalForward.UDP;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Message = SignalForward.TCP.Message;
@@ -234,18 +233,20 @@ namespace SignalForward
                 _remoteTcp.DataReceived += (object? sender, Message message) =>
                 {
                     if (_localUdp == null || _localUdp1 == null) return;
-                    if (message.Data[2] != 1)
+                    if (message.Data[1] != 1)
                     {
-                        Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
+                        Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}无触发信号:");
                         Logger.Info(message.Data);
                         Logger.Info("-------------------------");
                         return;
                     }
 
-                    var t = Encoding.ASCII.GetString(message.Data, 34, 6);
-                    var t1 = Encoding.ASCII.GetString(message.Data, 84, 6);
+                    //var t = Encoding.ASCII.GetString(message.Data, 34, 6);
+                    //var t1 = Encoding.ASCII.GetString(message.Data, 84, 6);
 
-                    if ((!t.Equals("000000")) == true && (!t1.Equals("000000")) == false)
+                    var template = new byte[] { 0, 0, 0, 0, 0, 0 };
+
+                    if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == true && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == false)
                     {
                         var newBytes = new byte[message.Data.Length];
                         newBytes[3] = 1;
@@ -258,7 +259,7 @@ namespace SignalForward
                         if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
                         RemoteQueue?.Enqueue(message.Data);
                     }
-                    else if ((!t.Equals("000000")) == false && (!t1.Equals("000000")) == true)
+                    else if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == false && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == true)
                     {
                         var newBytes = new byte[message.Data.Length];
                         newBytes[3] = 1;
@@ -271,7 +272,7 @@ namespace SignalForward
                         if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes);
                         RemoteQueue?.Enqueue(message.Data);
                     }
-                    else if ((!t.Equals("000000")) == true && (!t1.Equals("000000")) == true)
+                    else if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == true && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == true)
                     {
                         var newBytes = new byte[message.Data.Length];
                         newBytes[3] = 1;
@@ -293,6 +294,13 @@ namespace SignalForward
                         if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
                         if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes1);
                         RemoteQueue?.Enqueue(message.Data);
+                    }
+                    else
+                    {
+                        Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
+                        Logger.Info(message.Data);
+                        Logger.Info("-------------------------");
+                        return;
                     }
 
                     //switch (message.Data[2])
