@@ -994,7 +994,7 @@ namespace SignalForward
                                 LockMethod1(() =>
                                 {
                                     var c = Aoi2Message.Find(item =>
-                                        item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
+                                        item[2] == 3 && item.Skip(34).Take(10).ToArray()
                                             .SequenceEqual(destination2)
                                     );
                                     if (c != null)
@@ -1067,12 +1067,12 @@ namespace SignalForward
                                 //拍照中
                                 LockMethod(() =>
                                 {
-                                    a = Aoi1Message.Find(item => item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination3));
+                                    a = Aoi1Message.Find(item => item[2] == 0 && item.Skip(34).Take(10).ToArray().SequenceEqual(destination3));
                                 });
 
                                 LockMethod1(() =>
                                 {
-                                    a1 = Aoi2Message.Find(item => item[2] == 0 && item.Skip(34).Take(44 - 34).ToArray().SequenceEqual(destination4));
+                                    a1 = Aoi2Message.Find(item => item[2] == 0 && item.Skip(34).Take(10).ToArray().SequenceEqual(destination4));
                                 });
 
                                 if (a != null && a1 != null)
@@ -1095,7 +1095,7 @@ namespace SignalForward
                                 LockMethod(() =>
                                 {
                                     b = Aoi1Message.Find(item =>
-                                    item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray()
+                                    item[2] == 1 && item.Skip(34).Take(10).ToArray()
                                         .SequenceEqual(destination3)
                                 );
                                 });
@@ -1103,7 +1103,7 @@ namespace SignalForward
                                 LockMethod1(() =>
                                 {
                                     b1 = Aoi2Message.Find(item =>
-                                    item[2] == 1 && item.Skip(34).Take(44 - 34).ToArray()
+                                    item[2] == 1 && item.Skip(34).Take(10).ToArray()
                                         .SequenceEqual(destination4)
                                 );
                                 });
@@ -1129,7 +1129,7 @@ namespace SignalForward
                                 LockMethod(() =>
                                 {
                                     d = Aoi1Message.Find(item =>
-                                        item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
+                                        item[2] == 3 && item.Skip(34).Take(10).ToArray()
                                             .SequenceEqual(destination3)
                                     );
                                 });
@@ -1137,7 +1137,7 @@ namespace SignalForward
                                 LockMethod1(() =>
                                 {
                                     d1 = Aoi2Message.Find(item =>
-                                        item[2] == 3 && item.Skip(34).Take(44 - 34).ToArray()
+                                        item[2] == 3 && item.Skip(34).Take(10).ToArray()
                                             .SequenceEqual(destination4)
                                     );
                                 });
@@ -1147,10 +1147,11 @@ namespace SignalForward
                                     var re = new byte[value.Length];
                                     Array.Copy(value, re, value.Length);
                                     //re[0] = 1;
+                                    re[0] = 1;
                                     re[1] = 4;
-                                    re[49] = c[9];
+                                    re[49] = d[9];
                                     //re[51] = c[10];
-                                    re[99] = c1[9];
+                                    re[99] = d1[9];
                                     //re[101] = c1[10];
                                     _remoteTcp?.Write(re);
 
@@ -1159,15 +1160,15 @@ namespace SignalForward
                                     Logger?.Info("-------------------------");
                                     complete = false;
 
-                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); });
-                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); });
+                                    LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(d)); });
+                                    LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(d1)); });
                                 }
 
                                 //检测完成
                                 LockMethod(() =>
                                 {
                                     c = Aoi1Message.Find(item =>
-                                    item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray()
+                                    item[2] == 2 && item.Skip(34).Take(10).ToArray()
                                         .SequenceEqual(destination3)
                                 );
                                 });
@@ -1175,7 +1176,7 @@ namespace SignalForward
                                 LockMethod1(() =>
                                 {
                                     c1 = Aoi2Message.Find(item =>
-                                    item[2] == 2 && item.Skip(34).Take(44 - 34).ToArray()
+                                    item[2] == 2 && item.Skip(34).Take(10).ToArray()
                                         .SequenceEqual(destination4)
                                 );
                                 });
@@ -1184,11 +1185,11 @@ namespace SignalForward
                                 {
                                     var re = new byte[value.Length];
                                     Array.Copy(value, re, value.Length);
-                                    //re[0] = 1;
+                                    re[0] = 2;
                                     re[1] = 4;
-                                    re[49] = c[9];
+                                    //re[49] = c[9];
                                     re[51] = c[10];
-                                    re[99] = c1[9];
+                                    //re[99] = c1[9];
                                     re[101] = c1[10];
                                     _remoteTcp?.Write(re);
 
