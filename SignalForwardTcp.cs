@@ -570,7 +570,7 @@ namespace SignalForward
                                         //re[3] = 0;
                                         re[45] = c[9];
                                         re[47] = c[10];
-                                        _remoteTcp?.WriteAsync(re);
+                                        _remoteTcp?.Write(re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
@@ -899,7 +899,7 @@ namespace SignalForward
 
                                         re[49] = c[9];
                                         //re[51] = c[10];
-                                        _remoteTcp?.WriteAsync(re);
+                                        _remoteTcp?.Write(re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
@@ -924,7 +924,7 @@ namespace SignalForward
 
                                         re[49] = c[9];
                                         re[51] = c[10];
-                                        _remoteTcp?.WriteAsync(re);
+                                        _remoteTcp?.Write(re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
