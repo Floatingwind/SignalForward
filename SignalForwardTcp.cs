@@ -894,7 +894,7 @@ namespace SignalForward
                                     {
                                         var re = new byte[value.Length];
                                         Array.Copy(value, re, value.Length);
-
+                                        re[0] = 1;
                                         re[1] = 4;
 
                                         re[49] = c[9];
@@ -919,7 +919,7 @@ namespace SignalForward
                                     {
                                         var re = new byte[value.Length];
                                         Array.Copy(value, re, value.Length);
-
+                                        re[0] = 2;
                                         re[1] = 4;
 
                                         re[49] = c[9];
@@ -1001,7 +1001,7 @@ namespace SignalForward
                                     {
                                         var re = new byte[value.Length];
                                         Array.Copy(value, re, value.Length);
-
+                                        re[0] = 1;
                                         re[1] = 4;
 
                                         re[99] = c[9];
@@ -1027,7 +1027,7 @@ namespace SignalForward
                                     {
                                         var re = new byte[value.Length];
                                         Array.Copy(value, re, value.Length);
-                                        //re[0] = 1;
+                                        re[0] = 2;
                                         re[1] = 4;
 
                                         re[99] = c[9];
