@@ -87,6 +87,8 @@ namespace SignalForward
 
         private static int _timeout;
 
+        private byte[] _moRen = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
         public SignalForwardUdp()
         {
             Logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -325,7 +327,26 @@ namespace SignalForward
                     Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
-                    LockMethod(() => { Aoi1Message.Add(bytes); });
+
+                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    {
+                        if (_remoteUdp != null || _plcIpEndPoint != null)
+                        {
+                            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                        }
+                    }
+                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    {
+                        if (_remoteUdp != null || _plcIpEndPoint != null)
+                        {
+                            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                        }
+                    }
+                    else
+                    {
+                        LockMethod(() => { Aoi1Message.Add(bytes); });
+                    }
+
                 };
                 _localUdp.Start();
             }
@@ -375,7 +396,25 @@ namespace SignalForward
                     Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI2消息:");
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
-                    LockMethod1(() => { Aoi2Message.Add(bytes); });
+
+                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    {
+                        if (_remoteUdp != null || _plcIpEndPoint != null)
+                        {
+                            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                        }
+                    }
+                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    {
+                        if (_remoteUdp != null || _plcIpEndPoint != null)
+                        {
+                            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                        }
+                    }
+                    else
+                    {
+                        LockMethod1(() => { Aoi2Message.Add(bytes); });
+                    }
                 };
                 _localUdp1.Start();
                 _timeout = ((int)numericUpDown1.Value);

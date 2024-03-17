@@ -1602,7 +1602,7 @@ namespace SignalForward
             }
 
             // Create a file to write to.
-            await using var fs = File.Create(JsonPath);
+            using var fs = File.Create(JsonPath);
             var options = new JsonSerializerOptions { WriteIndented = true };
             await JsonSerializer.SerializeAsync(fs, json, options);
             await fs.FlushAsync();

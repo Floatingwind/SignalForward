@@ -19,10 +19,10 @@ namespace SignalForward
             System.Threading.Mutex mutex = new System.Threading.Mutex(true, Application.ProductName, out ret);
             if (ret)
             {
-                ApplicationConfiguration.Initialize();
-                //Application.EnableVisualStyles();
-                //Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new SignalForwardTcp());
+                //ApplicationConfiguration.Initialize();
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new SignalForwardUdp());
                 mutex.ReleaseMutex();
             }
             else
