@@ -95,6 +95,7 @@ namespace SignalForward.UDP
             catch (Exception exception)
             {
                 // ignored
+                _logger?.Error(exception.Message, exception);
             }
             finally
             {

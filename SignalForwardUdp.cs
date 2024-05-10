@@ -230,68 +230,78 @@ namespace SignalForward
                 _remoteUdp = new UdpSyncServer(IPAddress.Parse(Plc_oneIp.Text.Trim()), int.Parse(Plc_onePort.Text.Trim()), Logger);
                 _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
                 {
-                    if (_localUdp == null || _localUdp1 == null) return;
-                    switch (dataBytes[66])
+                    Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
+                    Logger.Info(dataBytes);
+                    Logger.Info("-----------------------------------------------------");
+                    if (_localUdp != null || _localUdp1 != null)
                     {
-                        case 1:
-                            if (dataBytes[3] == 1)
-                            {
-                                var newBytes = new byte[dataBytes.Length];
-                                newBytes[3] = 1;
-                                var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
-                                for (var i = 0; i < data.Length; i++)
+                        switch (dataBytes[66])
+                        {
+                            case 1:
+                                if (dataBytes[3] == 1)
                                 {
-                                    newBytes[34 + i] = data[i];
+                                    var newBytes = new byte[dataBytes.Length];
+                                    newBytes[3] = 1;
+                                    var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    for (var i = 0; i < data.Length; i++)
+                                    {
+                                        newBytes[34 + i] = data[i];
+                                    }
+                                    if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
+                                    RemoteQueue?.Enqueue(dataBytes);
                                 }
-                                if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
-                                RemoteQueue?.Enqueue(dataBytes);
-                            }
-                            break;
+                                break;
 
-                        case 2:
-                            if (dataBytes[3] == 1)
-                            {
-                                var newBytes = new byte[dataBytes.Length];
-                                newBytes[3] = 1;
-                                var data = dataBytes.Skip(44).Take(54 - 44).ToArray();
-                                for (var i = 0; i < data.Length; i++)
+                            case 2:
+                                if (dataBytes[3] == 1)
                                 {
-                                    newBytes[34 + i] = data[i];
+                                    var newBytes = new byte[dataBytes.Length];
+                                    newBytes[3] = 1;
+                                    var data = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                    for (var i = 0; i < data.Length; i++)
+                                    {
+                                        newBytes[34 + i] = data[i];
+                                    }
+                                    if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes);
+                                    RemoteQueue?.Enqueue(dataBytes);
                                 }
-                                if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes);
-                                RemoteQueue?.Enqueue(dataBytes);
-                            }
-                            break;
+                                break;
 
-                        case 3:
-                            if (dataBytes[3] == 1)
-                            {
-                                var newBytes = new byte[dataBytes.Length];
-                                newBytes[3] = 1;
-                                var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
-                                for (var i = 0; i < data.Length; i++)
+                            case 3:
+                                if (dataBytes[3] == 1)
                                 {
-                                    newBytes[34 + i] = data[i];
-                                }
-                                var newBytes1 = new byte[128];
-                                newBytes1[3] = 1;
-                                var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
-                                for (var i = 0; i < data1.Length; i++)
-                                {
-                                    newBytes1[34 + i] = data1[i];
-                                }
+                                    var newBytes = new byte[dataBytes.Length];
+                                    newBytes[3] = 1;
+                                    var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    for (var i = 0; i < data.Length; i++)
+                                    {
+                                        newBytes[34 + i] = data[i];
+                                    }
+                                    var newBytes1 = new byte[128];
+                                    newBytes1[3] = 1;
+                                    var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                    for (var i = 0; i < data1.Length; i++)
+                                    {
+                                        newBytes1[34 + i] = data1[i];
+                                    }
 
-                                if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
-                                if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes1);
-                                RemoteQueue?.Enqueue(dataBytes);
-                            }
-                            break;
+                                    if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
+                                    if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes1);
+                                    RemoteQueue?.Enqueue(dataBytes);
+                                }
+                                break;
 
-                        default:
-                            Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
-                            Logger.Info(dataBytes);
-                            Logger.Info("-------------------------");
-                            break;
+                            default:
+                                Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
+                                Logger.Info(dataBytes);
+                                Logger.Info("-------------------------");
+                                break;
+                        }
+
+                    }
+                    else
+                    {
+                        Logger.Info("本地连接AOI断开");
                     }
                 };
                 _remoteUdp.Start();
@@ -1172,7 +1182,7 @@ namespace SignalForward
                             timeOut = 0;
                             beforeDt = DateTime.Now;
 
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 2000)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 3500)
                             {
                                 //拍照中
                                 LockMethod(() =>
@@ -1257,7 +1267,7 @@ namespace SignalForward
                             var destination2 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 2000)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 3500)
                             {
                                 //拍照中
                                 LockMethod1(() =>
@@ -1342,7 +1352,7 @@ namespace SignalForward
                             var destination4 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 2000)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < 3500)
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
