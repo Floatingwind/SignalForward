@@ -1588,7 +1588,11 @@ namespace SignalForward
                                         }
                                         //re[9] = c[9];
                                         re[12] = c[12];
-                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+
+                                        var re2 = re.Take(90);
+                                        var waferData = c.Skip(90).Take(value.Length - 90);
+
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
@@ -1678,8 +1682,19 @@ namespace SignalForward
                                             re[9] = 1;
                                         }
                                         re[11] = c[12];
+
+                                        var re2 = re.Take(90).ToArray();
+                                        var waferData = c.Skip(90).Take(value.Length - 90).ToArray();
+                                        for (int i = 0; i < waferData.Length - 1; i++)
+                                        {
+                                            if (waferData[i] == 1)
+                                            {
+                                                waferData[i] = 2;
+                                            }
+                                        }
+
                                         //re[12] = c[11];
-                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                        _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
                                         Logger?.Info("-------------------------");
@@ -1804,7 +1819,33 @@ namespace SignalForward
                                     //re[10] = c[10];
                                     re[11] = c1[12];
                                     re[12] = c[12];
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+
+                                    var re2 = re.Take(90).ToArray();
+                                    var waferData = c.Skip(90).Take(value.Length - 90).ToArray();
+                                    var waferData1 = c1.Skip(90).Take(value.Length - 90).ToArray();
+                                    for (int i = 0; i < waferData.Length - 1; i++)
+                                    {
+                                        if (waferData[i] == waferData1[i])
+                                        {
+                                            if (waferData[i] == 1)
+                                            {
+                                                waferData[i] = 3;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (waferData[i] - waferData1[i] == 1)
+                                            {
+                                                waferData[i] = 1;
+                                            }
+                                            else if (waferData[i] - waferData1[i] == -1)
+                                            {
+                                                waferData[i] = 2;
+                                            }
+                                        }
+                                    }
+
+                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("-------------------------");
