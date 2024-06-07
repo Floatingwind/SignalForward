@@ -22,7 +22,7 @@ namespace SignalForward
                 //ApplicationConfiguration.Initialize();
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new SignalForwardUdp());
+                Application.Run(new SignalForwardTcp());
                 mutex.ReleaseMutex();
             }
             else

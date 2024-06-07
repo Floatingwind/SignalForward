@@ -244,64 +244,80 @@ namespace SignalForward
                     //var t = Encoding.ASCII.GetString(message.Data, 34, 6);
                     //var t1 = Encoding.ASCII.GetString(message.Data, 84, 6);
 
-                    var template = new byte[] { 0, 0, 0, 0, 0, 0 };
 
-                    if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == true && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == false)
+                    #region tcp双相机双半片
+                    //var template = new byte[] { 0, 0, 0, 0, 0, 0 };
+
+                    //if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == true && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == false)
+                    //{
+                    //    var newBytes = new byte[message.Data.Length];
+                    //    newBytes[3] = 1;
+                    //    message.Data[2] = 1;
+                    //    var data = message.Data.Skip(34).Take(10).ToArray();
+                    //    for (var i = 0; i < data.Length; i++)
+                    //    {
+                    //        newBytes[34 + i] = data[i];
+                    //    }
+                    //    if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
+                    //    RemoteQueue?.Enqueue(message.Data);
+                    //}
+                    //else if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == false && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == true)
+                    //{
+                    //    var newBytes = new byte[message.Data.Length];
+                    //    newBytes[3] = 1;
+                    //    message.Data[2] = 2;
+                    //    var data = message.Data.Skip(84).Take(10).ToArray();
+                    //    for (var i = 0; i < data.Length; i++)
+                    //    {
+                    //        newBytes[34 + i] = data[i];
+                    //    }
+                    //    if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes);
+                    //    RemoteQueue?.Enqueue(message.Data);
+                    //}
+                    //else if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == true && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == true)
+                    //{
+                    //    var newBytes = new byte[message.Data.Length];
+                    //    newBytes[3] = 1;
+                    //    //newBytes[30] = 1;
+                    //    var data = message.Data.Skip(34).Take(10).ToArray();
+                    //    for (var i = 0; i < data.Length; i++)
+                    //    {
+                    //        newBytes[34 + i] = data[i];
+                    //    }
+                    //    var newBytes1 = new byte[message.Data.Length];
+                    //    newBytes1[3] = 1;
+                    //    //newBytes1[30] = 2;
+                    //    var data1 = message.Data.Skip(84).Take(10).ToArray();
+                    //    for (var i = 0; i < data1.Length; i++)
+                    //    {
+                    //        newBytes1[34 + i] = data1[i];
+                    //    }
+                    //    message.Data[2] = 3;
+                    //    if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
+                    //    if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes1);
+                    //    RemoteQueue?.Enqueue(message.Data);
+                    //}
+                    //else
+                    //{
+                    //    Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
+                    //    Logger.Info(message.Data);
+                    //    Logger.Info("-------------------------");
+                    //    return;
+                    //}
+                    #endregion
+
+                    #region tcp单相机双半片
+                    if (_aoi1PortEndPoint != null)
                     {
-                        var newBytes = new byte[message.Data.Length];
-                        newBytes[3] = 1;
-                        message.Data[2] = 1;
-                        var data = message.Data.Skip(34).Take(10).ToArray();
-                        for (var i = 0; i < data.Length; i++)
-                        {
-                            newBytes[34 + i] = data[i];
-                        }
-                        if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
-                        RemoteQueue?.Enqueue(message.Data);
-                    }
-                    else if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == false && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == true)
-                    {
-                        var newBytes = new byte[message.Data.Length];
-                        newBytes[3] = 1;
-                        message.Data[2] = 2;
-                        var data = message.Data.Skip(84).Take(10).ToArray();
-                        for (var i = 0; i < data.Length; i++)
-                        {
-                            newBytes[34 + i] = data[i];
-                        }
-                        if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes);
-                        RemoteQueue?.Enqueue(message.Data);
-                    }
-                    else if ((!message.Data.Skip(34).Take(6).SequenceEqual(template)) == true && (!message.Data.Skip(84).Take(6).SequenceEqual(template)) == true)
-                    {
-                        var newBytes = new byte[message.Data.Length];
-                        newBytes[3] = 1;
-                        //newBytes[30] = 1;
-                        var data = message.Data.Skip(34).Take(10).ToArray();
-                        for (var i = 0; i < data.Length; i++)
-                        {
-                            newBytes[34 + i] = data[i];
-                        }
-                        var newBytes1 = new byte[message.Data.Length];
-                        newBytes1[3] = 1;
-                        //newBytes1[30] = 2;
-                        var data1 = message.Data.Skip(84).Take(10).ToArray();
-                        for (var i = 0; i < data1.Length; i++)
-                        {
-                            newBytes1[34 + i] = data1[i];
-                        }
-                        message.Data[2] = 3;
-                        if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
-                        if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes1);
+                        _localUdp.SendAsync(_aoi1PortEndPoint, message.Data);
                         RemoteQueue?.Enqueue(message.Data);
                     }
                     else
                     {
-                        Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
-                        Logger.Info(message.Data);
-                        Logger.Info("-------------------------");
-                        return;
+                        Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}-本地连接失败");
                     }
+
+                    #endregion
 
                     //switch (message.Data[2])
                     //{
@@ -472,7 +488,125 @@ namespace SignalForward
             }
         }
 
-        #region 正检
+        /// <summary>
+        /// 单相机双半片
+        /// </summary>
+        private void SingleCamera()
+        {
+            while (true)
+            {
+                _tokenSource1?.Token.ThrowIfCancellationRequested();
+                try
+                {
+                    long timeOut;
+                    DateTime beforeDt = default;
+                    //拍照中
+                    var inPhoto = true;
+                    //拍照完成
+                    var photoCompleted = true;
+                    //检测完成
+                    var complete = true;
+                    //收到的消息
+                    if (RemoteQueue == null || RemoveQueue == null || _localUdp == null || _localUdp1 == null)
+                    {
+                        continue;
+                    }
+                    RemoteQueue.Dequeue(out var value);
+                    Logger?.Info(value);
+
+                    var destination1 = value.Skip(34).Take(20).ToArray();
+                    timeOut = 0;
+                    beforeDt = DateTime.Now;
+
+                    while ((complete) && timeOut < (_timeout != default ? _timeout : 600))
+                    {
+                        ////拍照中
+                        //LockMethod(() =>
+                        //{
+                        //    var a = Aoi1Message.Find(item =>
+                        //        item[2] == 0 && item.Skip(34).Take(20).ToArray()
+                        //            .SequenceEqual(destination1)
+                        //    );
+
+                        //    if (a != null)
+                        //    {
+                        //        var re = new byte[value.Length];
+                        //        Array.Copy(value, re, value.Length);
+                        //        re[1] = 1;
+
+                        //        //_remoteTcp?.Write(re);
+                        //        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
+                        //        Logger?.Info(re);
+                        //        Logger?.Info("-------------------------");
+                        //        inPhoto = false;
+                        //        Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
+                        //    }
+                        //});
+
+                        ////拍照完成
+                        //LockMethod(() =>
+                        //{
+                        //    var b = Aoi1Message.Find(item =>
+                        //        item[2] == 1 && item.Skip(34).Take(20).ToArray()
+                        //            .SequenceEqual(destination1)
+                        //    );
+                        //    if (b != null)
+                        //    {
+                        //        var re = new byte[value.Length];
+                        //        Array.Copy(value, re, value.Length);
+                        //        re[1] = 2;
+                        //        //re[2] = 1;
+                        //        //re[3] = 0;
+                        //        _remoteTcp?.Write(re);
+                        //        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
+                        //        Logger?.Info(re);
+                        //        Logger?.Info("-------------------------");
+                        //        photoCompleted = false;
+                        //        Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
+                        //    }
+                        //});
+
+                        //检测完成
+                        LockMethod(() =>
+                        {
+                            var c = Aoi1Message.Find(item =>
+                               item[2] == 2 && item.Skip(34).Take(20).ToArray()
+                                   .SequenceEqual(destination1)
+                           );
+                            if (c != null)
+                            {
+                                //var re = new byte[value.Length];
+                                //Array.Copy(value, re, value.Length);
+                                //re[1] = 4;
+                                //re[2] = 1;
+                                ////re[3] = 0;
+                                //re[45] = c[9];
+                                //re[47] = c[10];
+                                _remoteTcp?.Write(c);
+                                Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                Logger?.Info(c);
+                                Logger?.Info("-------------------------");
+                                complete = false;
+                                Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
+                            }
+                        });
+
+                        var afterDt = DateTime.Now;
+                        var ts = afterDt.Subtract(beforeDt);
+                        timeOut = ts.Ticks / 10000;
+
+                        RemoveQueue.Enqueue(value);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger?.Error("返回消息给PLC出错:" + e.Message, e);
+                }
+
+            }
+        }
+
+        #region 正检适用于双相机双半片
 
         /// <summary>
         /// 转发AOI发送的消息给PLC
