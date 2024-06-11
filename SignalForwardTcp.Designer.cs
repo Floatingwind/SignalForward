@@ -503,6 +503,7 @@
             0,
             0,
             0});
+            this.tcpNumericUpDown1.ValueChanged += new System.EventHandler(this.tcpNumericUpDown1_ValueChanged);
             // 
             // tcpLabel18
             // 

@@ -87,7 +87,7 @@ namespace SignalForward
         /// </summary>
         private CancellationTokenSource? _tokenSource2 = new();
 
-        private static int _timeout;
+        private static int _timeout = 1000;
 
         public SignalForwardTcp()
         {
@@ -518,7 +518,7 @@ namespace SignalForward
                     timeOut = 0;
                     beforeDt = DateTime.Now;
 
-                    while ((complete) && timeOut < (_timeout != default ? _timeout : 600))
+                    while ((complete) && timeOut < _timeout)
                     {
                         ////拍照中
                         //LockMethod(() =>
@@ -640,7 +640,7 @@ namespace SignalForward
                             timeOut = 0;
                             beforeDt = DateTime.Now;
 
-                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 //拍照中
                                 LockMethod(() =>
@@ -724,7 +724,7 @@ namespace SignalForward
                             var destination2 = value.Skip(84).Take(10).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 //拍照中
                                 LockMethod1(() =>
@@ -808,7 +808,7 @@ namespace SignalForward
                             var destination4 = value.Skip(84).Take(10).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
@@ -971,7 +971,7 @@ namespace SignalForward
                             timeOut = 0;
                             beforeDt = DateTime.Now;
 
-                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 //拍照中
                                 LockMethod(() =>
@@ -1078,7 +1078,7 @@ namespace SignalForward
                             var destination2 = value.Skip(84).Take(10).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 //拍照中
                                 LockMethod1(() =>
@@ -1188,7 +1188,7 @@ namespace SignalForward
                             var destination4 = value.Skip(84).Take(10).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < (_timeout != default ? _timeout : 600))
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
@@ -1830,6 +1830,11 @@ namespace SignalForward
             if (_tokenSource2 == null) return;
             _tokenSource2.Cancel();
             _tokenSource2.Dispose();
+        }
+
+        private void tcpNumericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
