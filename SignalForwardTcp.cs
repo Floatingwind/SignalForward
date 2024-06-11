@@ -1716,7 +1716,7 @@ namespace SignalForward
             {
                 { "tcpCB", tcpCB.Checked },
                 { "tcpCP", tcpCP.Checked },
-                { "tcpNumericUpDown1", tcpNumericUpDown1.Value },
+                { "_timeout", _timeout },
                 { "tcpPlcIp", tcpPlcIp.Text },
                 { "tcpPlcPort", tcpPlcPort.Text },
                 { "tcpPlc_oneIp", tcpPlc_oneIp.Text },
@@ -1760,7 +1760,8 @@ namespace SignalForward
                 {
                     tcpCP.Checked = true;
                 }
-                tcpNumericUpDown1.Value = jsonNode!["tcpNumericUpDown1"]!.GetValue<decimal>();
+                _timeout = jsonNode!["_timeout"]!.GetValue<int>();
+                tcpNumericUpDown1.Value = _timeout;
                 tcpPlcIp.Text = jsonNode!["tcpPlcIp"]!.GetValue<string>();
                 tcpPlcPort.Text = jsonNode!["tcpPlcPort"]!.GetValue<string>();
                 tcpPlc_oneIp.Text = jsonNode!["tcpPlc_oneIp"]!.GetValue<string>();
@@ -1834,7 +1835,7 @@ namespace SignalForward
 
         private void tcpNumericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-
+            _timeout = (int)tcpNumericUpDown1.Value;
         }
     }
 }
