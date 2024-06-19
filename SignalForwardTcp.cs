@@ -418,7 +418,10 @@ namespace SignalForward
                     Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
                     Logger.Info(bytes);
                     Logger.Info("-------------------------");
-                    LockMethod(() => { Aoi1Message.Add(bytes); });
+                    if (bytes[2] == 2)
+                    {
+                        LockMethod(() => { Aoi1Message.Add(bytes); });
+                    }
                 };
                 _localUdp.Start();
             }
