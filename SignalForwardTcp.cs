@@ -1574,8 +1574,8 @@ namespace SignalForward
             }
         }
 
-        private string JsonPath { get; set; } = "setingTcp.Json";
-
+        //private string JsonPath { get; set; } = "setingTcp.Json";
+        private static string path = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "setingTcp.Json";
         private async void SaveJsonData()
         {
             var json = new JsonObject
@@ -1596,13 +1596,13 @@ namespace SignalForward
                 { "tcpAoi2Ip", tcpAoi2Ip.Text },
                 { "tcpAoi2Port", tcpAoi2Port.Text }
             };
-            if (File.Exists(this.JsonPath))
+            if (File.Exists(path))
             {
-                File.Delete(JsonPath);
+                File.Delete(path);
             }
 
             // Create a file to write to.
-            using var fs = File.Create(JsonPath);
+            using var fs = File.Create(path);
             var options = new JsonSerializerOptions { WriteIndented = true };
             await JsonSerializer.SerializeAsync(fs, json, options);
             await fs.FlushAsync();
@@ -1612,9 +1612,9 @@ namespace SignalForward
         {
             try
             {
-                if (!File.Exists(this.JsonPath)) return false;
+                if (!File.Exists(path)) return false;
                 // 读取 配置文件
-                var jsonString = File.ReadAllText(JsonPath);
+                var jsonString = File.ReadAllText(path);
                 // 将 读取到的内容 反序列化 为 JSON DOM 对象
                 var jsonNode = JsonNode.Parse(jsonString)!;
                 // 从 DOM 对象中取值并 赋给 控件

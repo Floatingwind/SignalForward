@@ -272,6 +272,7 @@ namespace SignalForward
                                 {
                                     var newBytes = new byte[dataBytes.Length];
                                     newBytes[3] = 1;
+                                    newBytes[5] = 1;
                                     var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
                                     for (var i = 0; i < data.Length; i++)
                                     {
@@ -2225,7 +2226,7 @@ namespace SignalForward
             }
         }
 
-        private string JsonPath { get; set; } = "setingUdp.Json";
+        private static string path = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "setingTcp.Json";
 
         private async void SaveJsonData()
         {
@@ -2247,13 +2248,13 @@ namespace SignalForward
             json.Add("Aoi2_onePort", Aoi2_onePort.Text);
             json.Add("Aoi2Ip", Aoi2Ip.Text);
             json.Add("Aoi2Port", Aoi2Port.Text);
-            if (File.Exists(this.JsonPath))
+            if (File.Exists(path))
             {
-                File.Delete(JsonPath);
+                File.Delete(path);
             }
 
             // Create a file to write to.
-            using (FileStream FS = File.Create(JsonPath))
+            using (FileStream FS = File.Create(path))
             {
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 await JsonSerializer.SerializeAsync(FS, json, options);
@@ -2265,10 +2266,10 @@ namespace SignalForward
         {
             try
             {
-                if (File.Exists(this.JsonPath))
+                if (File.Exists(path))
                 {
                     // 读取 配置文件
-                    var jsonString = File.ReadAllText(JsonPath);
+                    var jsonString = File.ReadAllText(path);
                     // 将 读取到的内容 反序列化 为 JSON DOM 对象
                     var jsonNode = JsonNode.Parse(jsonString)!;
                     // 从 DOM 对象中取值并 赋给 控件
