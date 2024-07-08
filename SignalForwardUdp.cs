@@ -85,7 +85,7 @@ namespace SignalForward
         /// </summary>
         private CancellationTokenSource? _tokenSource2 = new();
 
-        private static int _timeout;
+        private int _timeout = 600;
 
         private byte[] _moRen = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -1183,7 +1183,7 @@ namespace SignalForward
                             timeOut = 0;
                             beforeDt = DateTime.Now;
 
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 3500)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 //拍照中
                                 LockMethod(() =>
@@ -1268,7 +1268,7 @@ namespace SignalForward
                             var destination2 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 3500)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 //拍照中
                                 LockMethod1(() =>
@@ -1353,7 +1353,7 @@ namespace SignalForward
                             var destination4 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 3500)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
@@ -1516,7 +1516,7 @@ namespace SignalForward
                             var destination1 = value.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 2000)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 //拍照中
                                 LockMethod(() =>
@@ -1613,7 +1613,7 @@ namespace SignalForward
                             var destination2 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 2000)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 //拍照中
                                 LockMethod1(() =>
@@ -1716,7 +1716,7 @@ namespace SignalForward
                             var destination4 = value.Skip(44).Take(54 - 44).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
-                            while ((inPhoto || photoCompleted || complete) && timeOut < 2000)
+                            while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
                                 byte[] a = default;
                                 byte[] a1 = default;
