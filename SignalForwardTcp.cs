@@ -87,7 +87,7 @@ namespace SignalForward
         /// </summary>
         private CancellationTokenSource? _tokenSource2 = new();
 
-        private int _timeout = 600;
+        private static int _timeout = 600;
 
         public SignalForwardTcp()
         {
@@ -1696,6 +1696,11 @@ namespace SignalForward
             if (_tokenSource2 == null) return;
             _tokenSource2.Cancel();
             _tokenSource2.Dispose();
+        }
+
+        private void tcpNumericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            _timeout = (int)tcpNumericUpDown1.Value;
         }
     }
 }

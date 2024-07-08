@@ -85,7 +85,7 @@ namespace SignalForward
         /// </summary>
         private CancellationTokenSource? _tokenSource2 = new();
 
-        private int _timeout = 600;
+        private static int _timeout = 600;
 
         private byte[] _moRen = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -2361,6 +2361,11 @@ namespace SignalForward
             if (_tokenSource2 == null) return;
             _tokenSource2.Cancel();
             _tokenSource2.Dispose();
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            _timeout = (int)numericUpDown1.Value;
         }
     }
 }

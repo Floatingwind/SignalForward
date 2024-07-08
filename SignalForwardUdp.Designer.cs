@@ -503,6 +503,7 @@
             0,
             0,
             0});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label18
             // 
@@ -550,7 +551,7 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "模式";
             // 
-            // SignalForward
+            // SignalForwardUdp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -560,7 +561,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Name = "SignalForward";
+            this.Name = "SignalForwardUdp";
             this.Text = "SignalForward";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SignalForward_FormClosing);
             this.groupBox1.ResumeLayout(false);

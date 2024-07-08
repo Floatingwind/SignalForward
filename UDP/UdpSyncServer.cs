@@ -87,7 +87,7 @@ namespace SignalForward.UDP
             try
             {
                 if (!ar.IsCompleted) return;
-                buffer = Server.EndReceive(ar, ref remote);
+                buffer = Server?.EndReceive(ar, ref remote);
 
                 //触发数据收到事件
                 RaiseDataReceived(buffer);
