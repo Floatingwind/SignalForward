@@ -247,8 +247,19 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
+
+                                    var newBytes1 = new byte[128];
+                                    newBytes1[3] = 1;
+                                    var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                    for (var i = 0; i < data1.Length; i++)
+                                    {
+                                        newBytes1[34 + i] = data1[i];
+                                    }
+                                    if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes1);
+
                                     if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
                                     RemoteQueue?.Enqueue(dataBytes);
+
                                 }
                                 break;
 
@@ -262,6 +273,16 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
+
+                                    var newBytes1 = new byte[128];
+                                    newBytes1[3] = 1;
+                                    var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    for (var i = 0; i < data1.Length; i++)
+                                    {
+                                        newBytes1[34 + i] = data1[i];
+                                    }
+                                    if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes1);
+
                                     if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes);
                                     RemoteQueue?.Enqueue(dataBytes);
                                 }
@@ -353,6 +374,9 @@ namespace SignalForward
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
+                    else if ((bytes[2] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)) || (bytes[2] == 2 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)) || (bytes[2] == 0 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
+                    {
+                    }
                     else
                     {
                         LockMethod(() => { Aoi1Message.Add(bytes); });
@@ -421,6 +445,9 @@ namespace SignalForward
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
+                    }
+                    else if ((bytes[2] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)) || (bytes[2] == 2 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)) || (bytes[2] == 0 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
+                    {
                     }
                     else
                     {
