@@ -259,7 +259,6 @@ namespace SignalForward
 
                                     if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
                                     RemoteQueue?.Enqueue(dataBytes);
-
                                 }
                                 break;
 
@@ -319,7 +318,6 @@ namespace SignalForward
                                 Logger.Info("-------------------------");
                                 break;
                         }
-
                     }
                     else
                     {
@@ -381,7 +379,6 @@ namespace SignalForward
                     {
                         LockMethod(() => { Aoi1Message.Add(bytes); });
                     }
-
                 };
                 _localUdp.Start();
             }
