@@ -230,9 +230,9 @@ namespace SignalForward
                 _remoteUdp = new UdpSyncServer(IPAddress.Parse(Plc_oneIp.Text.Trim()), int.Parse(Plc_onePort.Text.Trim()), Logger);
                 _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
                 {
-                    Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
-                    Logger.Info(dataBytes);
-                    Logger.Info("-----------------------------------------------------");
+                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
+                    Logger?.Info(dataBytes);
+                    Logger?.Info("----------------------------------------------------");
                     if (_localUdp != null || _localUdp1 != null)
                     {
                         switch (dataBytes[66])
@@ -313,15 +313,15 @@ namespace SignalForward
                                 break;
 
                             default:
-                                Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
-                                Logger.Info(dataBytes);
-                                Logger.Info("-------------------------");
+                                Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
+                                Logger?.Info(dataBytes);
+                                Logger?.Info("----------------------------------------------------");
                                 break;
                         }
                     }
                     else
                     {
-                        Logger.Info("本地连接AOI断开");
+                        Logger?.Info("本地连接AOI断开");
                     }
                 };
                 _remoteUdp.Start();
@@ -354,9 +354,9 @@ namespace SignalForward
                     int.Parse(Aoi_onePort.Text.Trim()), Logger);
                 _localUdp.DataReceived += (o, bytes) =>
                 {
-                    Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
-                    Logger.Info(bytes);
-                    Logger.Info("-------------------------");
+                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
+                    Logger?.Info(bytes);
+                    Logger?.Info("----------------------------------------------------");
 
                     if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
                     {
@@ -378,6 +378,9 @@ namespace SignalForward
                     else
                     {
                         LockMethod(() => { Aoi1Message.Add(bytes); });
+                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
+                        Logger?.Info(bytes);
+                        Logger?.Info("----------------------------------------------------");
                     }
                 };
                 _localUdp.Start();
@@ -425,9 +428,9 @@ namespace SignalForward
                     int.Parse(Aoi2_onePort.Text.Trim()), Logger);
                 _localUdp1.DataReceived += (o, bytes) =>
                 {
-                    Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI2消息:");
-                    Logger.Info(bytes);
-                    Logger.Info("----------------------------------------------------");
+                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI2消息:");
+                    Logger?.Info(bytes);
+                    Logger?.Info("----------------------------------------------------");
 
                     if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
                     {
@@ -449,6 +452,9 @@ namespace SignalForward
                     else
                     {
                         LockMethod1(() => { Aoi2Message.Add(bytes); });
+                        Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
+                        Logger?.Info(bytes);
+                        Logger?.Info("----------------------------------------------------");
                     }
                 };
                 _localUdp1.Start();
@@ -1227,7 +1233,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         inPhoto = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
@@ -1250,7 +1256,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
@@ -1275,7 +1281,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
@@ -1311,7 +1317,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         inPhoto = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
@@ -1334,7 +1340,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         photoCompleted = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
@@ -1359,7 +1365,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
@@ -1407,7 +1413,7 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC");
                                     Logger?.Info(re);
-                                    Logger?.Info("-------------------------");
+                                    Logger?.Info("----------------------------------------------------");
                                     inPhoto = false;
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); });
@@ -1441,7 +1447,7 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
-                                    Logger?.Info("-------------------------");
+                                    Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
@@ -1479,7 +1485,7 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
-                                    Logger?.Info("-------------------------");
+                                    Logger?.Info("----------------------------------------------------");
                                     complete = false;
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); });
@@ -1559,7 +1565,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         inPhoto = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
@@ -1582,7 +1588,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         photoCompleted = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
@@ -1620,7 +1626,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         complete = false;
                                         Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
@@ -1656,7 +1662,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         inPhoto = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(a));
                                     }
@@ -1679,7 +1685,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         photoCompleted = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     }
@@ -1722,7 +1728,7 @@ namespace SignalForward
                                         _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
                                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                         Logger?.Info(re);
-                                        Logger?.Info("-------------------------");
+                                        Logger?.Info("----------------------------------------------------");
                                         complete = false;
                                         Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
                                     }
@@ -1775,7 +1781,7 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照中O->PLC");
                                     Logger?.Info(re);
-                                    Logger?.Info("-------------------------");
+                                    Logger?.Info("----------------------------------------------------");
                                     inPhoto = false;
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(a)); });
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(a1)); });
@@ -1805,7 +1811,7 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
-                                    Logger?.Info("-------------------------");
+                                    Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
 
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(b)); });
@@ -1873,7 +1879,7 @@ namespace SignalForward
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
-                                    Logger?.Info("-------------------------");
+                                    Logger?.Info("----------------------------------------------------");
                                     complete = false;
                                     LockMethod(() => { Aoi1Message.RemoveAll(item => item.SequenceEqual(c)); });
                                     LockMethod1(() => { Aoi2Message.RemoveAll(item => item.SequenceEqual(c1)); });
