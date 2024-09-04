@@ -87,8 +87,8 @@ namespace SignalForward
 
         private static int _timeout = 600;
 
-        private byte[] _moRen = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
+        private byte[] _moRen1 = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        private byte[] _moRen = new byte[] { 48, 48, 48, 48, 48, 48, 48, 48, 48, 48 };
         public SignalForwardUdp()
         {
             Logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -358,14 +358,14 @@ namespace SignalForward
                     Logger?.Info(bytes);
                     Logger?.Info("----------------------------------------------------");
 
-                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen1))
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
-                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen1))
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
@@ -432,14 +432,14 @@ namespace SignalForward
                     Logger?.Info(bytes);
                     Logger?.Info("----------------------------------------------------");
 
-                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen1))
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
-                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen1))
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
