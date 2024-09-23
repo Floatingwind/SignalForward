@@ -358,21 +358,21 @@ namespace SignalForward
                     Logger?.Info(bytes);
                     Logger?.Info("----------------------------------------------------");
 
-                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen1))
+                    if (bytes[1] == 1 && bytes[2] == 3) //&& bytes.Skip(34).Take(10).SequenceEqual(_moRen1)
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
-                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen1))
+                    else if (bytes[1] == 0 && bytes[2] == 3) // && bytes.Skip(34).Take(10).SequenceEqual(_moRen1)
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
-                    else if ((bytes[2] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)) || (bytes[2] == 2 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)) || (bytes[2] == 0 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
+                    else if ((bytes[2] == 1 || bytes[2] == 2 || bytes[2] == 0) && (bytes.Skip(34).Take(10).SequenceEqual(_moRen1) || bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
                     {
                     }
                     else
@@ -432,21 +432,21 @@ namespace SignalForward
                     Logger?.Info(bytes);
                     Logger?.Info("----------------------------------------------------");
 
-                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen1))
+                    if (bytes[1] == 1 && bytes[2] == 3) //&& bytes.Skip(34).Take(10).SequenceEqual(_moRen1)
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
-                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen1))
+                    else if (bytes[1] == 0 && bytes[2] == 3) //&& bytes.Skip(34).Take(10).SequenceEqual(_moRen1)
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
-                    else if ((bytes[2] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)) || (bytes[2] == 2 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)) || (bytes[2] == 0 && bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
+                    else if ((bytes[2] == 1 || bytes[2] == 2 || bytes[2] == 0) && (bytes.Skip(34).Take(10).SequenceEqual(_moRen1) || bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
                     {
                     }
                     else
