@@ -89,6 +89,8 @@ namespace SignalForward
 
         private byte[] _moRen = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
+        private byte[] _moRen1 = new byte[] { 48, 48, 48, 48, 48, 48, 48, 48, 48, 48 };
+
         public SignalForwardUdp()
         {
             Logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -325,6 +327,9 @@ namespace SignalForward
         {
             try
             {
+
+
+
                 if (Logger == null) return;
                 button1.Enabled = false;
                 button4.Enabled = true;
@@ -338,21 +343,21 @@ namespace SignalForward
                     Logger.Info(bytes);
                     Logger.Info("----------------------------------------------------");
 
-                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    if ((bytes[1] == 1 && bytes[2] == 3) || (bytes[1] == 0 && bytes[2] == 3))  //&& bytes.Skip(34).Take(10).SequenceEqual(_moRen))
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
-                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
-                    {
-                        if (_remoteUdp != null || _plcIpEndPoint != null)
-                        {
-                            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
-                        }
-                    }
-                    else
+                    //else if (bytes[1] == 0 && bytes[2] == 3)  //&& bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    //{
+                    //    if (_remoteUdp != null || _plcIpEndPoint != null)
+                    //    {
+                    //        _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                    //    }
+                    //}
+                    else if ((bytes[2] == 1 || bytes[2] == 2 || bytes[2] == 0) && (bytes.Skip(34).Take(10).SequenceEqual(_moRen1) || bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
                     {
                         LockMethod(() => { Aoi1Message.Add(bytes); });
                     }
