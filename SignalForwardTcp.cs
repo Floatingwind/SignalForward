@@ -1576,6 +1576,7 @@ namespace SignalForward
 
         //private string JsonPath { get; set; } = "setingTcp.Json";
         private static string path = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "setingTcp.Json";
+
         private async void SaveJsonData()
         {
             var json = new JsonObject

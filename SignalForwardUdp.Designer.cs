@@ -72,6 +72,7 @@
             this.CB = new System.Windows.Forms.RadioButton();
             this.CP = new System.Windows.Forms.RadioButton();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label19 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -551,11 +552,21 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "模式";
             // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(8, 468);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(17, 12);
+            this.label19.TabIndex = 8;
+            this.label19.Text = "V1";
+            // 
             // SignalForwardUdp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(684, 489);
+            this.Controls.Add(this.label19);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -574,6 +585,7 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -623,5 +635,6 @@
         private RadioButton CB;
         private RadioButton CP;
         private GroupBox groupBox4;
+        private Label label19;
     }
 }

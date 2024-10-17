@@ -298,7 +298,6 @@ namespace SignalForward
                                 Logger.Info("-------------------------");
                                 break;
                         }
-
                     }
                     else
                     {
@@ -337,7 +336,7 @@ namespace SignalForward
                 {
                     Logger.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
                     Logger.Info(bytes);
-                    Logger.Info("-------------------------");
+                    Logger.Info("----------------------------------------------------");
 
                     if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
                     {
@@ -357,7 +356,6 @@ namespace SignalForward
                     {
                         LockMethod(() => { Aoi1Message.Add(bytes); });
                     }
-
                 };
                 _localUdp.Start();
             }
