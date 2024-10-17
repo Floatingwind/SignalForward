@@ -327,9 +327,6 @@ namespace SignalForward
         {
             try
             {
-
-
-
                 if (Logger == null) return;
                 button1.Enabled = false;
                 button4.Enabled = true;
@@ -357,7 +354,11 @@ namespace SignalForward
                     //        _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                     //    }
                     //}
-                    else if ((bytes[2] == 1 || bytes[2] == 2 || bytes[2] == 0) && (bytes.Skip(34).Take(10).SequenceEqual(_moRen1) || bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
+                    else if (bytes[2] == 0)
+                    {
+                        Logger.Info("屏蔽拍照中");
+                    }
+                    else
                     {
                         LockMethod(() => { Aoi1Message.Add(bytes); });
                     }
@@ -411,19 +412,23 @@ namespace SignalForward
                     Logger.Info(bytes);
                     Logger.Info("----------------------------------------------------");
 
-                    if (bytes[1] == 1 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    if ((bytes[1] == 1 && bytes[2] == 3) || (bytes[1] == 0 && bytes[2] == 3)) // && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
                     {
                         if (_remoteUdp != null || _plcIpEndPoint != null)
                         {
                             _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
                         }
                     }
-                    else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    //else if (bytes[2] == 3 && bytes.Skip(34).Take(10).SequenceEqual(_moRen))
+                    //{
+                    //    if (_remoteUdp != null || _plcIpEndPoint != null)
+                    //    {
+                    //        _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                    //    }
+                    //}
+                    else if (bytes[2] == 0)
                     {
-                        if (_remoteUdp != null || _plcIpEndPoint != null)
-                        {
-                            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
-                        }
+                        Logger.Info("屏蔽拍照中");
                     }
                     else
                     {
