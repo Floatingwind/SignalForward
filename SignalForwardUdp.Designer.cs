@@ -509,7 +509,7 @@
             // numericUpDown1
             // 
             this.numericUpDown1.Location = new System.Drawing.Point(350, 26);
-            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(4);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -539,7 +539,7 @@
             // 
             this.CB.AutoSize = true;
             this.CB.Location = new System.Drawing.Point(23, 28);
-            this.CB.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CB.Margin = new System.Windows.Forms.Padding(4);
             this.CB.Name = "CB";
             this.CB.Size = new System.Drawing.Size(50, 21);
             this.CB.TabIndex = 5;
@@ -552,7 +552,7 @@
             // 
             this.CP.AutoSize = true;
             this.CP.Location = new System.Drawing.Point(92, 28);
-            this.CP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CP.Margin = new System.Windows.Forms.Padding(4);
             this.CP.Name = "CP";
             this.CP.Size = new System.Drawing.Size(50, 21);
             this.CP.TabIndex = 6;
@@ -568,9 +568,9 @@
             this.groupBox4.Controls.Add(this.label18);
             this.groupBox4.Controls.Add(this.CP);
             this.groupBox4.Location = new System.Drawing.Point(16, 7);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox4.Size = new System.Drawing.Size(771, 67);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
@@ -581,9 +581,9 @@
             this.label19.AutoSize = true;
             this.label19.Location = new System.Drawing.Point(13, 550);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(23, 17);
+            this.label19.Size = new System.Drawing.Size(33, 17);
             this.label19.TabIndex = 8;
-            this.label19.Text = "V1";
+            this.label19.Text = "V1.1";
             // 
             // SignalForwardUdp
             // 
