@@ -8,6 +8,8 @@ namespace SignalForward
 {
     public partial class SignalForwardUdp : Form
     {
+        #region 变量
+
         public log4net.ILog? Logger;
 
         /// <summary>
@@ -89,27 +91,49 @@ namespace SignalForward
 
         private byte[] _moRen1 = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         private byte[] _moRen = new byte[] { 48, 48, 48, 48, 48, 48, 48, 48, 48, 48 };
+
+        public string passWord = "123456";
+
+        #endregion 变量
+
         public SignalForwardUdp()
         {
             Logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
             RemoteQueue = new WhCurrentQueue<byte[]>("等待发送结果", Logger);
             RemoveQueue = new WhCurrentQueue<byte[]>("等待删除结果", Logger);
             InitializeComponent();
-            PlcIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
-            PlcPort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
-            Plc_oneIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
-            Plc_onePort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            //PlcIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            //PlcPort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            //Plc_oneIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
+            //Plc_onePort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
 
-            Aoi1_oneIp.DataBindings.Add("Enabled", button1, "Enabled");
-            Aoi_onePort.DataBindings.Add("Enabled", button1, "Enabled");
-            Aoi1Ip.DataBindings.Add("Enabled", button1, "Enabled");
-            Aoi1Port.DataBindings.Add("Enabled", button1, "Enabled");
+            //Aoi1_oneIp.DataBindings.Add("Enabled", button1, "Enabled");
+            //Aoi_onePort.DataBindings.Add("Enabled", button1, "Enabled");
+            //Aoi1Ip.DataBindings.Add("Enabled", button1, "Enabled");
+            //Aoi1Port.DataBindings.Add("Enabled", button1, "Enabled");
 
-            Aoi2_oneIp.DataBindings.Add("Enabled", button2, "Enabled");
-            Aoi2_onePort.DataBindings.Add("Enabled", button2, "Enabled");
-            Aoi2Ip.DataBindings.Add("Enabled", button2, "Enabled");
-            Aoi2Port.DataBindings.Add("Enabled", button2, "Enabled");
-            numericUpDown1.DataBindings.Add("Enabled", button2, "Enabled");
+            //Aoi2_oneIp.DataBindings.Add("Enabled", button2, "Enabled");
+            //Aoi2_onePort.DataBindings.Add("Enabled", button2, "Enabled");
+            //Aoi2Ip.DataBindings.Add("Enabled", button2, "Enabled");
+            //Aoi2Port.DataBindings.Add("Enabled", button2, "Enabled");
+            //numericUpDown1.DataBindings.Add("Enabled", button2, "Enabled");
+
+            PlcIp.Enabled = false;
+            PlcPort.Enabled = false;
+            Plc_oneIp.Enabled = false;
+            Plc_onePort.Enabled = false;
+
+            Aoi1_oneIp.Enabled = false;
+            Aoi_onePort.Enabled = false;
+            Aoi1Ip.Enabled = false;
+            Aoi1Port.Enabled = false;
+
+            Aoi2_oneIp.Enabled = false;
+            Aoi2_onePort.Enabled = false;
+            Aoi2Ip.Enabled = false;
+            Aoi2Port.Enabled = false;
+            numericUpDown1.Enabled = false;
+
             InitParam();
             Task.Factory.StartNew(Remove, _tokenSource2.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
@@ -418,7 +442,21 @@ namespace SignalForward
                 {
                     CP.Enabled = false;
                 }
+                PlcIp.Enabled = false;
+                PlcPort.Enabled = false;
+                Plc_oneIp.Enabled = false;
+                Plc_onePort.Enabled = false;
 
+                Aoi1_oneIp.Enabled = false;
+                Aoi_onePort.Enabled = false;
+                Aoi1Ip.Enabled = false;
+                Aoi1Port.Enabled = false;
+
+                Aoi2_oneIp.Enabled = false;
+                Aoi2_onePort.Enabled = false;
+                Aoi2Ip.Enabled = false;
+                Aoi2Port.Enabled = false;
+                numericUpDown1.Enabled = false;
                 if (Logger == null) return;
                 button2.Enabled = false;
                 button5.Enabled = true;
@@ -2278,6 +2316,7 @@ namespace SignalForward
             json.Add("Aoi2_onePort", Aoi2_onePort.Text);
             json.Add("Aoi2Ip", Aoi2Ip.Text);
             json.Add("Aoi2Port", Aoi2Port.Text);
+            json.Add("PassWord", passWord);
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -2326,7 +2365,7 @@ namespace SignalForward
                     Aoi2_onePort.Text = jsonNode!["Aoi2_onePort"]!.GetValue<string>();
                     Aoi2Ip.Text = jsonNode!["Aoi2Ip"]!.GetValue<string>();
                     Aoi2Port.Text = jsonNode!["Aoi2Port"]!.GetValue<string>();
-
+                    passWord = jsonNode!["PassWord"]!.GetValue<string>();
                     return true;
                 }
                 return false;
@@ -2396,6 +2435,47 @@ namespace SignalForward
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             _timeout = (int)numericUpDown1.Value;
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            var login = new LoginScreen(passWord);
+            if (login.ShowDialog() == DialogResult.OK)
+            {
+                PlcIp.Enabled = true;
+                PlcPort.Enabled = true;
+                Plc_oneIp.Enabled = true;
+                Plc_onePort.Enabled = true;
+
+                Aoi1_oneIp.Enabled = true;
+                Aoi_onePort.Enabled = true;
+                Aoi1Ip.Enabled = true;
+                Aoi1Port.Enabled = true;
+
+                Aoi2_oneIp.Enabled = true;
+                Aoi2_onePort.Enabled = true;
+                Aoi2Ip.Enabled = true;
+                Aoi2Port.Enabled = true;
+                numericUpDown1.Enabled = true;
+            }
+            else
+            {
+                PlcIp.Enabled = false;
+                PlcPort.Enabled = false;
+                Plc_oneIp.Enabled = false;
+                Plc_onePort.Enabled = false;
+
+                Aoi1_oneIp.Enabled = false;
+                Aoi_onePort.Enabled = false;
+                Aoi1Ip.Enabled = false;
+                Aoi1Port.Enabled = false;
+
+                Aoi2_oneIp.Enabled = false;
+                Aoi2_onePort.Enabled = false;
+                Aoi2Ip.Enabled = false;
+                Aoi2Port.Enabled = false;
+                numericUpDown1.Enabled = false;
+            }
         }
     }
 }
