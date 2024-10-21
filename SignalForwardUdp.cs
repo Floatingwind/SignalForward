@@ -375,7 +375,7 @@ namespace SignalForward
                     else if ((bytes[2] == 1 || bytes[2] == 2 || bytes[2] == 0) && (bytes.Skip(34).Take(10).SequenceEqual(_moRen1) || bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
                     {
                     }
-                    else
+                    else if (bytes[2] != 0)
                     {
                         LockMethod(() => { Aoi1Message.Add(bytes); });
                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
@@ -449,7 +449,7 @@ namespace SignalForward
                     else if ((bytes[2] == 1 || bytes[2] == 2 || bytes[2] == 0) && (bytes.Skip(34).Take(10).SequenceEqual(_moRen1) || bytes.Skip(34).Take(10).SequenceEqual(_moRen)))
                     {
                     }
-                    else
+                    else if (bytes[2] != 0)
                     {
                         LockMethod1(() => { Aoi2Message.Add(bytes); });
                         Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
@@ -1193,7 +1193,7 @@ namespace SignalForward
                     long timeOut;
                     DateTime beforeDt = default;
                     //拍照中
-                    var inPhoto = true;
+                    var inPhoto = false;
                     //拍照完成
                     var photoCompleted = true;
                     //检测完成
@@ -1527,7 +1527,7 @@ namespace SignalForward
                     long timeOut;
                     DateTime beforeDt = default;
                     //拍照中
-                    var inPhoto = true;
+                    var inPhoto = false;
                     //拍照完成
                     var photoCompleted = true;
                     //检测完成
