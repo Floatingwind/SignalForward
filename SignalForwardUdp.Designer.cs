@@ -73,8 +73,8 @@
             this.CB = new System.Windows.Forms.RadioButton();
             this.CP = new System.Windows.Forms.RadioButton();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.label19 = new System.Windows.Forms.Label();
             this.button6 = new System.Windows.Forms.Button();
+            this.label19 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -579,15 +579,6 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "模式";
             // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(13, 558);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(33, 17);
-            this.label19.TabIndex = 8;
-            this.label19.Text = "V1.2";
-            // 
             // button6
             // 
             this.button6.Location = new System.Drawing.Point(610, 23);
@@ -597,6 +588,15 @@
             this.button6.Text = "修改";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(13, 558);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(40, 17);
+            this.label19.TabIndex = 8;
+            this.label19.Text = "V1.21";
             // 
             // SignalForwardUdp
             // 
