@@ -297,6 +297,7 @@ namespace SignalForward
 
                                     var newBytes1 = new byte[128];
                                     newBytes1[3] = 1;
+                                    newBytes1[20] = 1;
                                     var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
                                     for (var i = 0; i < data1.Length; i++)
                                     {
@@ -322,6 +323,7 @@ namespace SignalForward
 
                                     var newBytes1 = new byte[128];
                                     newBytes1[3] = 1;
+                                    newBytes1[20] = 1;
                                     var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
                                     for (var i = 0; i < data1.Length; i++)
                                     {
