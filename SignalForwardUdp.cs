@@ -89,6 +89,8 @@ namespace SignalForward
 
         private static int _timeout = 600;
 
+        private static int _timeout1 = 2;
+
         private byte[] _moRen1 = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         private byte[] _moRen = new byte[] { 48, 48, 48, 48, 48, 48, 48, 48, 48, 48 };
 
@@ -137,6 +139,7 @@ namespace SignalForward
             Aoi2Ip.Enabled = false;
             Aoi2Port.Enabled = false;
             numericUpDown1.Enabled = false;
+            numericUpDown2.Enabled = false;
 
             InitParam();
             CallOnClick(RemoteBnt);
@@ -281,6 +284,7 @@ namespace SignalForward
                 _remoteUdp = new UdpSyncServer(IPAddress.Parse(Plc_oneIp.Text.Trim()), int.Parse(Plc_onePort.Text.Trim()), Logger);
 
                 BeforeTime = DateTime.Now;
+                _timeout1 = (int)numericUpDown2.Value;
                 _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
                 {
                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
@@ -289,7 +293,7 @@ namespace SignalForward
                     if (_localUdp != null || _localUdp1 != null)
                     {
                         CurTime = DateTime.Now;
-                        if (CurTime.Subtract(BeforeTime).TotalSeconds > 2)
+                        if (CurTime.Subtract(BeforeTime).TotalSeconds > _timeout1)
                         {
                             LockMethod(() =>
                             {
@@ -503,6 +507,7 @@ namespace SignalForward
                 Aoi2Ip.Enabled = false;
                 Aoi2Port.Enabled = false;
                 numericUpDown1.Enabled = false;
+                numericUpDown2.Enabled = false;
                 if (Logger == null) return;
                 button2.Enabled = false;
                 button5.Enabled = true;
@@ -2348,6 +2353,7 @@ namespace SignalForward
             json.Add("CB", CB.Checked);
             json.Add("CP", CP.Checked);
             json.Add("numericUpDown1", numericUpDown1.Value);
+            json.Add("numericUpDown2", numericUpDown2.Value);
             json.Add("PlcIp", PlcIp.Text);
             json.Add("PlcPort", PlcPort.Text);
             json.Add("Plc_oneIp", Plc_oneIp.Text);
@@ -2397,6 +2403,7 @@ namespace SignalForward
                         CP.Checked = true;
                     }
                     numericUpDown1.Value = jsonNode!["numericUpDown1"]!.GetValue<decimal>();
+                    numericUpDown2.Value = jsonNode!["numericUpDown2"]!.GetValue<decimal>();
                     PlcIp.Text = jsonNode!["PlcIp"]!.GetValue<string>();
                     PlcPort.Text = jsonNode!["PlcPort"]!.GetValue<string>();
                     Plc_oneIp.Text = jsonNode!["Plc_oneIp"]!.GetValue<string>();
@@ -2503,6 +2510,7 @@ namespace SignalForward
                 Aoi2Ip.Enabled = true;
                 Aoi2Port.Enabled = true;
                 numericUpDown1.Enabled = true;
+                numericUpDown2.Enabled = true;
             }
             else
             {
@@ -2521,7 +2529,13 @@ namespace SignalForward
                 Aoi2Ip.Enabled = false;
                 Aoi2Port.Enabled = false;
                 numericUpDown1.Enabled = false;
+                numericUpDown2.Enabled = false;
             }
+        }
+
+        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+        {
+            _timeout1 = (int)numericUpDown2.Value;
         }
     }
 }
