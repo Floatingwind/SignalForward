@@ -596,7 +596,7 @@
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(40, 17);
             this.label19.TabIndex = 8;
-            this.label19.Text = "V1.21";
+            this.label19.Text = "V1.22";
             // 
             // SignalForwardUdp
             // 

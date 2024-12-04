@@ -94,6 +94,10 @@ namespace SignalForward
 
         public string passWord = "123456";
 
+        public DateTime CurTime = default;
+
+        public DateTime BeforeTime = default;
+
         #endregion 变量
 
         public SignalForwardUdp()
@@ -275,6 +279,8 @@ namespace SignalForward
                 _plcIpEndPoint = new IPEndPoint(IPAddress.Parse(PlcIp.Text.Trim()), int.Parse(PlcPort.Text.Trim()));
 
                 _remoteUdp = new UdpSyncServer(IPAddress.Parse(Plc_oneIp.Text.Trim()), int.Parse(Plc_onePort.Text.Trim()), Logger);
+
+                BeforeTime = DateTime.Now;
                 _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
                 {
                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
@@ -282,6 +288,21 @@ namespace SignalForward
                     Logger?.Info("----------------------------------------------------");
                     if (_localUdp != null || _localUdp1 != null)
                     {
+                        CurTime = DateTime.Now;
+                        if (CurTime.Subtract(BeforeTime).TotalSeconds > 2)
+                        {
+                            LockMethod(() =>
+                            {
+                                Aoi1Message.Clear();
+                            });
+                            LockMethod1(() =>
+                            {
+                                Aoi2Message.Clear();
+                            });
+                            RemoteQueue?.Clear();
+                            Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}清除通讯数据缓存");
+                        }
+                        BeforeTime = CurTime;
                         switch (dataBytes[66])
                         {
                             case 1:
