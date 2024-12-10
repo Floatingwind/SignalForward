@@ -319,6 +319,11 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
+                                    var data2 = dataBytes.Skip(80).Take(100 - 80).ToArray();
+                                    for (var i = 0; i < data2.Length; i++)
+                                    {
+                                        newBytes[44 + i] = data2[i];
+                                    }
 
                                     var newBytes1 = new byte[128];
                                     newBytes1[3] = 1;
@@ -328,6 +333,7 @@ namespace SignalForward
                                     {
                                         newBytes1[34 + i] = data1[i];
                                     }
+
                                     if (_aoi2PortEndPoint != null) _localUdp1.SendAsync(_aoi2PortEndPoint, newBytes1);
 
                                     if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
@@ -344,6 +350,11 @@ namespace SignalForward
                                     for (var i = 0; i < data.Length; i++)
                                     {
                                         newBytes[34 + i] = data[i];
+                                    }
+                                    var data2 = dataBytes.Skip(100).Take(120 - 100).ToArray();
+                                    for (var i = 0; i < data2.Length; i++)
+                                    {
+                                        newBytes[44 + i] = data2[i];
                                     }
 
                                     var newBytes1 = new byte[128];
@@ -372,12 +383,23 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
+                                    var data2 = dataBytes.Skip(80).Take(100 - 80).ToArray();
+                                    for (var i = 0; i < data2.Length; i++)
+                                    {
+                                        newBytes[44 + i] = data2[i];
+                                    }
+
                                     var newBytes1 = new byte[128];
                                     newBytes1[3] = 1;
                                     var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
                                     for (var i = 0; i < data1.Length; i++)
                                     {
                                         newBytes1[34 + i] = data1[i];
+                                    }
+                                    var data3 = dataBytes.Skip(100).Take(120 - 100).ToArray();
+                                    for (var i = 0; i < data3.Length; i++)
+                                    {
+                                        newBytes1[44 + i] = data3[i];
                                     }
 
                                     if (_aoi1PortEndPoint != null) _localUdp.SendAsync(_aoi1PortEndPoint, newBytes);
