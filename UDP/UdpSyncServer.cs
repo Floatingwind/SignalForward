@@ -258,6 +258,14 @@ namespace SignalForward.UDP
             semaphore.Release(1);
             Logger?.Info($"{$"[{Name}]",-10}{"队列入队成功！",-18}剩余 {count}");
         }
+
+        public void Clear()
+        {
+            while (_queue.TryDequeue(out _))
+            {
+
+            }
+        }
     }
 
     public class AsyncUDPState

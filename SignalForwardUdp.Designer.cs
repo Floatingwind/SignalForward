@@ -73,11 +73,14 @@
             this.CP = new System.Windows.Forms.RadioButton();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.label19 = new System.Windows.Forms.Label();
+            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.label20 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -563,6 +566,8 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.label20);
+            this.groupBox4.Controls.Add(this.numericUpDown2);
             this.groupBox4.Controls.Add(this.CB);
             this.groupBox4.Controls.Add(this.numericUpDown1);
             this.groupBox4.Controls.Add(this.label18);
@@ -581,9 +586,43 @@
             this.label19.AutoSize = true;
             this.label19.Location = new System.Drawing.Point(13, 550);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(33, 17);
+            this.label19.Size = new System.Drawing.Size(40, 17);
             this.label19.TabIndex = 8;
-            this.label19.Text = "V1.1";
+            this.label19.Text = "V1.11";
+            // 
+            // numericUpDown2
+            // 
+            this.numericUpDown2.Location = new System.Drawing.Point(587, 26);
+            this.numericUpDown2.Margin = new System.Windows.Forms.Padding(4);
+            this.numericUpDown2.Maximum = new decimal(new int[] {
+            6000,
+            0,
+            0,
+            0});
+            this.numericUpDown2.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.numericUpDown2.Name = "numericUpDown2";
+            this.numericUpDown2.Size = new System.Drawing.Size(78, 23);
+            this.numericUpDown2.TabIndex = 7;
+            this.numericUpDown2.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.numericUpDown2.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(467, 31);
+            this.label20.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(112, 17);
+            this.label20.TabIndex = 8;
+            this.label20.Text = "自动清除缓存(秒)：";
             // 
             // SignalForwardUdp
             // 
@@ -609,6 +648,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -661,5 +701,7 @@
         private RadioButton CP;
         private GroupBox groupBox4;
         private Label label19;
+        private Label label20;
+        private NumericUpDown numericUpDown2;
     }
 }
