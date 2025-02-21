@@ -266,7 +266,6 @@ namespace SignalForward.UDP
         {
             while (_queue.TryDequeue(out _))
             {
-
             }
         }
     }
