@@ -46,12 +46,12 @@ namespace SignalForward
         /// <summary>
         /// 通讯信号
         /// </summary>
-        public WhCurrentQueue<byte[]>? RemoteQueue;
+        public WhCurrentQueue<PendingData>? RemoteQueue;
 
         /// <summary>
         /// 待删除的信号
         /// </summary>
-        public WhCurrentQueue<byte[]>? RemoveQueue;
+        public WhCurrentQueue<PendingData>? RemoveQueue;
 
         /// <summary>
         /// AOI1发送的消息
@@ -106,8 +106,8 @@ namespace SignalForward
         public SignalForwardUdp()
         {
             Logger = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-            RemoteQueue = new WhCurrentQueue<byte[]>("等待发送结果", Logger);
-            RemoveQueue = new WhCurrentQueue<byte[]>("等待删除结果", Logger);
+            RemoteQueue = new WhCurrentQueue<PendingData>("等待发送结果", Logger);
+            RemoveQueue = new WhCurrentQueue<PendingData>("等待删除结果", Logger);
             InitializeComponent();
             //PlcIp.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
             //PlcPort.DataBindings.Add("Enabled", RemoteBnt, "Enabled");
@@ -171,106 +171,118 @@ namespace SignalForward
 
         #region 同步方式
 
-        public void Communication()
-        {
-            while (true)
-            {
-                byte[] data;
-                if (_localUdp == null || _localUdp1 == null || RemoteQueue == null)
-                {
-                    continue;
-                }
-                RemoteQueue.Dequeue(out data);
-                switch (data[43])
-                {
-                    case 1:
-                        if (data[3] == 1)
-                        {
-                            _localUdp.Send(_aoi1PortEndPoint, data);
-                            bool control = true;
-                            while (control)
-                            {
-                                IPEndPoint rEndPoint = default;
-                                byte[] buff = _localUdp.Server.Receive(ref rEndPoint);
-                                if (buff != default)
-                                {
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, buff);
-                                }
-                                if (buff[2] == 2)
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        break;
+        //public void Communication()
+        //{
+        //    while (true)
+        //    {
+        //        byte[] data;
+        //        if (_localUdp == null || _localUdp1 == null || RemoteQueue == null)
+        //        {
+        //            continue;
+        //        }
+        //        RemoteQueue.Dequeue(out data);
+        //        switch (data[43])
+        //        {
+        //            case 1:
+        //                if (data[3] == 1)
+        //                {
+        //                    _localUdp.Send(_aoi1PortEndPoint, data);
+        //                    bool control = true;
+        //                    while (control)
+        //                    {
+        //                        IPEndPoint rEndPoint = default;
+        //                        byte[] buff = _localUdp.Server.Receive(ref rEndPoint);
+        //                        if (buff != default)
+        //                        {
+        //                            _remoteUdp.SendAsync(_plcIpEndPoint, buff);
+        //                        }
+        //                        if (buff[2] == 2)
+        //                        {
+        //                            break;
+        //                        }
+        //                    }
+        //                }
+        //                break;
 
-                    case 2:
-                        if (data[3] == 1)
-                        {
-                            _localUdp1.Send(_aoi2PortEndPoint, data);
-                            bool control = true;
-                            while (control)
-                            {
-                                IPEndPoint rEndPoint = default;
-                                byte[] buff = _localUdp1.Server.Receive(ref rEndPoint);
-                                if (buff != default)
-                                {
-                                    _remoteUdp.SendAsync(_plcIpEndPoint, buff);
-                                }
-                                if (buff[2] == 2)
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        break;
+        //            case 2:
+        //                if (data[3] == 1)
+        //                {
+        //                    _localUdp1.Send(_aoi2PortEndPoint, data);
+        //                    bool control = true;
+        //                    while (control)
+        //                    {
+        //                        IPEndPoint rEndPoint = default;
+        //                        byte[] buff = _localUdp1.Server.Receive(ref rEndPoint);
+        //                        if (buff != default)
+        //                        {
+        //                            _remoteUdp.SendAsync(_plcIpEndPoint, buff);
+        //                        }
+        //                        if (buff[2] == 2)
+        //                        {
+        //                            break;
+        //                        }
+        //                    }
+        //                }
+        //                break;
 
-                    case 3:
-                        if (data[3] == 1)
-                        {
-                            //事务列表
-                            List<Task<byte[]>> tasks = new List<Task<byte[]>>();
-                            _localUdp.SendAsync(_aoi1PortEndPoint, data);
-                            _localUdp1.SendAsync(_aoi2PortEndPoint, data);
-                            bool control = true;
-                            while (control)
-                            {
-                                Task<byte[]> result = new Task<byte[]>((() =>
-                                {
-                                    IPEndPoint ipEnd = default;
-                                    return _localUdp.Server.Receive(ref ipEnd);
-                                }));
-                                tasks.Add(result);
-                                Task<byte[]> result1 = new Task<byte[]>((() =>
-                                {
-                                    IPEndPoint ipEnd = default;
-                                    return _localUdp1.Server.Receive(ref ipEnd);
-                                }));
-                                tasks.Add(result1);
-                                result.Start();
-                                result1.Start();
+        //            case 3:
+        //                if (data[3] == 1)
+        //                {
+        //                    //事务列表
+        //                    List<Task<byte[]>> tasks = new List<Task<byte[]>>();
+        //                    _localUdp.SendAsync(_aoi1PortEndPoint, data);
+        //                    _localUdp1.SendAsync(_aoi2PortEndPoint, data);
+        //                    bool control = true;
+        //                    while (control)
+        //                    {
+        //                        Task<byte[]> result = new Task<byte[]>((() =>
+        //                        {
+        //                            IPEndPoint ipEnd = default;
+        //                            return _localUdp.Server.Receive(ref ipEnd);
+        //                        }));
+        //                        tasks.Add(result);
+        //                        Task<byte[]> result1 = new Task<byte[]>((() =>
+        //                        {
+        //                            IPEndPoint ipEnd = default;
+        //                            return _localUdp1.Server.Receive(ref ipEnd);
+        //                        }));
+        //                        tasks.Add(result1);
+        //                        result.Start();
+        //                        result1.Start();
 
-                                List<byte[]> r = new List<byte[]>();
-                                foreach (var item in tasks)
-                                {
-                                    r.Add(item.Result);
-                                }
+        //                    List<byte[]> r = new List<byte[]>();
+        //                    foreach (var item in tasks)
+        //                    {
+        //                        r.Add(item.Result);
+        //                    }
 
-                                if (r[0][2] == 2 && r[1][2] == 2)
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        break;
+        //                    if (r[0][2] == 2 && r[1][2] == 2)
+        //                    {
+        //                        break;
+        //                    }
+        //                }
+        //            }
+        //            break;
 
-                    default:
-                        break;
-                }
-            }
-        }
+        //        default:
+        //            break;
+        //    }
+        //}
+        //}
 
         #endregion 同步方式
+
+        public byte[] GetBytes()
+        {
+            // 使用当前时间的毫秒部分作为随机种子
+            int seed = DateTime.Now.Millisecond;
+            Random random = new Random(seed);
+            // 创建一个5位的字节数组
+            byte[] byteArray = new byte[10];
+            // 填充字节数组
+            random.NextBytes(byteArray);
+            return byteArray;
+        }
 
         private void RemoteBnt_Click_1(object sender, EventArgs e)
         {
@@ -325,16 +337,23 @@ namespace SignalForward
                                     var newBytes1 = new byte[128];
                                     newBytes1[3] = 1;
                                     newBytes1[20] = 1;
-                                    var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                    var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    var id = GetBytes();
                                     for (var i = 0; i < data1.Length; i++)
                                     {
-                                        newBytes1[34 + i] = data1[i];
+                                        newBytes1[34 + i] = id[i];
                                     }
 
                                     if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes1);
 
                                     if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes);
-                                    RemoteQueue?.Enqueue(dataBytes);
+                                    var datas = new PendingData();
+                                    datas.Type = 3;
+                                    datas.ty = 1;
+                                    datas.Bytes1 = newBytes;
+                                    datas.Bytes2 = newBytes1;
+                                    datas.BytesOriginal = dataBytes;
+                                    RemoteQueue?.Enqueue(datas);
                                 }
                                 break;
 
@@ -358,14 +377,21 @@ namespace SignalForward
                                     newBytes1[3] = 1;
                                     newBytes1[20] = 1;
                                     var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    var id = GetBytes();
                                     for (var i = 0; i < data1.Length; i++)
                                     {
-                                        newBytes1[34 + i] = data1[i];
+                                        newBytes1[34 + i] = id[i];
                                     }
                                     if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes1);
 
                                     if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes);
-                                    RemoteQueue?.Enqueue(dataBytes);
+                                    var datas = new PendingData();
+                                    datas.Type = 3;
+                                    datas.ty = 2;
+                                    datas.Bytes1 = newBytes1;
+                                    datas.Bytes2 = newBytes;
+                                    datas.BytesOriginal = dataBytes;
+                                    RemoteQueue?.Enqueue(datas);
                                 }
                                 break;
 
@@ -401,7 +427,13 @@ namespace SignalForward
 
                                     if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes);
                                     if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes1);
-                                    RemoteQueue?.Enqueue(dataBytes);
+                                    var datas = new PendingData();
+                                    datas.Type = 3;
+                                    datas.ty = 3;
+                                    datas.Bytes1 = newBytes;
+                                    datas.Bytes2 = newBytes1;
+                                    datas.BytesOriginal = dataBytes;
+                                    RemoteQueue?.Enqueue(datas);
                                 }
                                 break;
 
@@ -1353,17 +1385,17 @@ namespace SignalForward
                     //检测完成
                     var complete = true;
                     //收到的消息
-                    byte[] value = default;
+                    PendingData value = default;
                     if (RemoteQueue == null || _plcIpEndPoint == null || RemoveQueue == null || _localUdp == null || _localUdp1 == null)
                     {
                         continue;
                     }
                     RemoteQueue.Dequeue(out value);
                     Logger?.Info(value);
-                    switch (value[66])
+                    switch (value.Type)
                     {
                         case 1:
-                            var destination1 = value.Skip(34).Take(44 - 34).ToArray();
+                            var destination1 = value.Bytes1.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
 
@@ -1404,8 +1436,8 @@ namespace SignalForward
                                 //);
                                 if (!b.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
@@ -1430,8 +1462,8 @@ namespace SignalForward
                                 //);
                                 if (!c.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 2;
                                     re[3] = 0;
@@ -1455,7 +1487,7 @@ namespace SignalForward
                             break;
 
                         case 2:
-                            var destination2 = value.Skip(44).Take(54 - 44).ToArray();
+                            var destination2 = value.Bytes2.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
@@ -1494,8 +1526,8 @@ namespace SignalForward
                                 //);
                                 if (!b.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
@@ -1520,8 +1552,8 @@ namespace SignalForward
                                 //);
                                 if (!c.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 2;
                                     re[3] = 0;
@@ -1545,8 +1577,8 @@ namespace SignalForward
                             break;
 
                         case 3:
-                            var destination3 = value.Skip(34).Take(44 - 34).ToArray();
-                            var destination4 = value.Skip(44).Take(54 - 44).ToArray();
+                            var destination3 = value.Bytes1.Skip(34).Take(44 - 34).ToArray();
+                            var destination4 = value.Bytes2.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
@@ -1613,8 +1645,8 @@ namespace SignalForward
 
                                 if (!b.Equals(default(KeyValuePair<byte[], byte[]>)) && !b1.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
@@ -1662,15 +1694,29 @@ namespace SignalForward
 
                                 if (!c.Equals(default(KeyValuePair<byte[], byte[]>)) && !c1.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 2;
                                     re[3] = 0;
-                                    re[9] = c.Value[9];
-                                    re[10] = c.Value[10];
-                                    re[11] = c1.Value[9];
-                                    re[12] = c1.Value[10];
+                                    switch (value.ty)
+                                    {
+                                        case 1:
+                                            re[9] = c.Value[9];
+                                            re[10] = c.Value[10];
+                                            break;
+                                        case 2:
+                                            re[11] = c1.Value[9];
+                                            re[12] = c1.Value[10];
+                                            break;
+                                        case 3:
+                                            re[9] = c.Value[9];
+                                            re[10] = c.Value[10];
+                                            re[11] = c1.Value[9];
+                                            re[12] = c1.Value[10];
+                                            break;
+                                    }
+
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
@@ -1727,18 +1773,17 @@ namespace SignalForward
                     var photoCompleted = true;
                     //检测完成
                     var complete = true;
-                    //收到的消息
-                    byte[] value = default;
+                    PendingData value = default;
                     if (RemoteQueue == null || _plcIpEndPoint == null || RemoveQueue == null || _localUdp == null || _localUdp1 == null)
                     {
                         continue;
                     }
                     RemoteQueue.Dequeue(out value);
                     Logger?.Info(value);
-                    switch (value[66])
+                    switch (value.Type)
                     {
                         case 1:
-                            var destination1 = value.Skip(34).Take(44 - 34).ToArray();
+                            var destination1 = value.Bytes1.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
@@ -1779,8 +1824,8 @@ namespace SignalForward
                                 //);
                                 if (!b.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
@@ -1807,8 +1852,8 @@ namespace SignalForward
                                 //);
                                 if (!c.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 2;
                                     re[3] = 0;
@@ -1825,7 +1870,7 @@ namespace SignalForward
                                     re[12] = c.Value[12];
 
                                     var re2 = re.Take(90);
-                                    var waferData = c.Value.Skip(90).Take(value.Length - 90);
+                                    var waferData = c.Value.Skip(90).Take(value.BytesOriginal.Length - 90);
 
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
                                     Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
@@ -1845,7 +1890,7 @@ namespace SignalForward
                             break;
 
                         case 2:
-                            var destination2 = value.Skip(44).Take(54 - 44).ToArray();
+                            var destination2 = value.Bytes2.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
@@ -1886,8 +1931,8 @@ namespace SignalForward
                                 //);
                                 if (!b.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
@@ -1912,8 +1957,8 @@ namespace SignalForward
                                 //);
                                 if (!c.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 2;
                                     re[3] = 0;
@@ -1928,7 +1973,7 @@ namespace SignalForward
                                     re[11] = c.Value[12];
 
                                     var re2 = re.Take(90).ToArray();
-                                    var waferData = c.Value.Skip(90).Take(value.Length - 90).ToArray();
+                                    var waferData = c.Value.Skip(90).Take(value.BytesOriginal.Length - 90).ToArray();
                                     for (int i = 0; i < waferData.Length - 1; i++)
                                     {
                                         if (waferData[i] == 1)
@@ -1956,8 +2001,8 @@ namespace SignalForward
                             break;
 
                         case 3:
-                            var destination3 = value.Skip(34).Take(44 - 34).ToArray();
-                            var destination4 = value.Skip(44).Take(54 - 44).ToArray();
+                            var destination3 = value.Bytes1.Skip(34).Take(44 - 34).ToArray();
+                            var destination4 = value.Bytes2.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
@@ -2023,8 +2068,8 @@ namespace SignalForward
 
                                 if (!b.Equals(default(KeyValuePair<byte[], byte[]>)) && !b1.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
@@ -2068,8 +2113,8 @@ namespace SignalForward
 
                                 if (!c.Equals(default(KeyValuePair<byte[], byte[]>)) && !c1.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
-                                    var re = new byte[value.Length];
-                                    Array.Copy(value, re, value.Length);
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
                                     re[2] = 2;
                                     re[3] = 0;
@@ -2086,8 +2131,8 @@ namespace SignalForward
                                     re[12] = c.Value[12];
 
                                     var re2 = re.Take(90).ToArray();
-                                    var waferData = c.Value.Skip(90).Take(value.Length - 90).ToArray();
-                                    var waferData1 = c1.Value.Skip(90).Take(value.Length - 90).ToArray();
+                                    var waferData = c.Value.Skip(90).Take(value.BytesOriginal.Length - 90).ToArray();
+                                    var waferData1 = c1.Value.Skip(90).Take(value.BytesOriginal.Length - 90).ToArray();
                                     for (int i = 0; i < waferData.Length - 1; i++)
                                     {
                                         if (waferData[i] == waferData1[i])
@@ -2694,4 +2739,21 @@ namespace SignalForward
             _timeout1 = (int)numericUpDown2.Value;
         }
     }
+
+    /// <summary>
+    /// 待处理数据
+    /// </summary>
+    public class PendingData
+    {
+        public int ty { get; set; }
+
+        public int Type { get; set; }
+
+        public byte[] Bytes1 { get; set; }
+
+        public byte[] Bytes2 { get; set; }
+
+        public byte[] BytesOriginal { get; set; }
+    }
 }
+
