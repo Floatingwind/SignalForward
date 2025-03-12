@@ -648,6 +648,7 @@
             this.Name = "SignalForwardUdp";
             this.Text = "SignalForward";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SignalForward_FormClosing);
+            this.Load += new System.EventHandler(this.SignalForwardUdp_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

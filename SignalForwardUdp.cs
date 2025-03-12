@@ -2738,6 +2738,28 @@ namespace SignalForward
         {
             _timeout1 = (int)numericUpDown2.Value;
         }
+
+        private void SignalForwardUdp_Load(object sender, EventArgs e)
+        {
+            string file = "D:\\logs";
+            if (!File.Exists(file))
+            {
+                var paths = Directory.GetDirectories(file);
+                foreach (var item in paths)
+                {
+                    // 创建 DirectoryInfo 对象
+                    DirectoryInfo directoryInfo = new(item);
+                    // 获取目录创建时间
+                    DateTime creationTime = directoryInfo.CreationTime;
+                    if (DateTime.Now.AddDays(-3) > creationTime)
+                    {
+                        // 使用 Directory.Delete 删除目录及其内容
+                        // 第二个参数 'true' 指定递归删除（包括子目录和文件）
+                        Directory.Delete(item, true);
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>
