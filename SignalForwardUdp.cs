@@ -300,7 +300,7 @@ namespace SignalForward
                 _timeout1 = (int)numericUpDown2.Value;
                 _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
                 {
-                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
+                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
                     Logger?.Info(dataBytes);
                     Logger?.Info("----------------------------------------------------");
                     if (_localUdp != null || _localUdp1 != null)
@@ -313,7 +313,7 @@ namespace SignalForward
                             Aoi2Message?.Clear();
 
                             RemoteQueue?.Clear();
-                            Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}清除通讯数据缓存");
+                            Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}清除通讯数据缓存");
                         }
                         BeforeTime = CurTime;
                         switch (dataBytes[66])
@@ -438,7 +438,7 @@ namespace SignalForward
                                 break;
 
                             default:
-                                Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
+                                Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
                                 Logger?.Info(dataBytes);
                                 Logger?.Info("----------------------------------------------------");
                                 break;
@@ -479,7 +479,7 @@ namespace SignalForward
                     int.Parse(Aoi_onePort.Text.Trim()), Logger);
                 _localUdp.DataReceived += (o, bytes) =>
                 {
-                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
+                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
                     Logger?.Info(bytes);
                     Logger?.Info("----------------------------------------------------");
 
@@ -497,10 +497,11 @@ namespace SignalForward
 
                         case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
                             break;
-
+                        case byte[] n when (n[1] == 0 && n[1] == 1 && n[2] == 0):
+                            break;
                         default:
                             Aoi1Message.TryAdd(bytes, bytes);
-                            Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
+                            Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
                             Logger?.Info(bytes);
                             Logger?.Info("----------------------------------------------------");
                             break;
@@ -591,7 +592,7 @@ namespace SignalForward
                     int.Parse(Aoi2_onePort.Text.Trim()), Logger);
                 _localUdp1.DataReceived += (o, bytes) =>
                 {
-                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI2消息:");
+                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI2消息:");
                     Logger?.Info(bytes);
                     Logger?.Info("----------------------------------------------------");
 
@@ -609,10 +610,11 @@ namespace SignalForward
 
                         case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
                             break;
-
+                        case byte[] n when (n[1] == 0 && n[1] == 1 && n[2] == 0):
+                            break;
                         default:
                             Aoi2Message.TryAdd(bytes, bytes);
-                            Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
+                            Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
                             Logger?.Info(bytes);
                             Logger?.Info("----------------------------------------------------");
                             break;
@@ -1442,7 +1444,7 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
@@ -1470,7 +1472,7 @@ namespace SignalForward
                                     re[9] = c.Value[9];
                                     re[10] = c.Value[10];
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     complete = false;
@@ -1532,7 +1534,7 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
@@ -1560,7 +1562,7 @@ namespace SignalForward
                                     re[11] = c.Value[9];
                                     re[12] = c.Value[10];
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     complete = false;
@@ -1651,7 +1653,7 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
@@ -1718,7 +1720,7 @@ namespace SignalForward
                                     }
 
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     complete = false;
@@ -1830,7 +1832,7 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
@@ -1873,7 +1875,7 @@ namespace SignalForward
                                     var waferData = c.Value.Skip(90).Take(value.BytesOriginal.Length - 90);
 
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     complete = false;
@@ -1937,7 +1939,7 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
@@ -1984,7 +1986,7 @@ namespace SignalForward
 
                                     //re[12] = c[11];
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     complete = false;
@@ -2074,7 +2076,7 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
@@ -2156,7 +2158,7 @@ namespace SignalForward
                                     }
 
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re2.Concat(waferData).ToArray());
-                                    Logger?.Info($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
                                     complete = false;
@@ -2751,7 +2753,7 @@ namespace SignalForward
                     DirectoryInfo directoryInfo = new(item);
                     // 获取目录创建时间
                     DateTime creationTime = directoryInfo.CreationTime;
-                    if (DateTime.Now.AddDays(-3) > creationTime)
+                    if (DateTime.Now.AddDays(-7) > creationTime)
                     {
                         // 使用 Directory.Delete 删除目录及其内容
                         // 第二个参数 'true' 指定递归删除（包括子目录和文件）
