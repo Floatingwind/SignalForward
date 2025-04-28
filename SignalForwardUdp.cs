@@ -101,6 +101,8 @@ namespace SignalForward
 
         public DateTime BeforeTime = default;
 
+        public bool IsUse = false;
+
         #endregion 变量
 
         public SignalForwardUdp()
@@ -336,7 +338,10 @@ namespace SignalForward
 
                                     var newBytes1 = new byte[128];
                                     newBytes1[3] = 1;
-                                    newBytes1[20] = 1;
+                                    if (IsUse)
+                                    {
+                                        newBytes1[20] = 1;
+                                    }
                                     var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
                                     var id = GetBytes();
                                     for (var i = 0; i < data1.Length; i++)
@@ -375,7 +380,10 @@ namespace SignalForward
 
                                     var newBytes1 = new byte[128];
                                     newBytes1[3] = 1;
-                                    newBytes1[20] = 1;
+                                    if (IsUse)
+                                    {
+                                        newBytes1[20] = 1;
+                                    }
                                     var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
                                     var id = GetBytes();
                                     for (var i = 0; i < data1.Length; i++)
@@ -497,7 +505,7 @@ namespace SignalForward
 
                         case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
                             break;
-                        case byte[] n when (n[1] == 0 && n[1] == 1 && n[2] == 0):
+                        case byte[] n when (n[0] == 0 && n[1] == 1 && n[2] == 0):
                             break;
                         default:
                             Aoi1Message.TryAdd(bytes, bytes);
@@ -610,7 +618,7 @@ namespace SignalForward
 
                         case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
                             break;
-                        case byte[] n when (n[1] == 0 && n[1] == 1 && n[2] == 0):
+                        case byte[] n when (n[0] == 0 && n[1] == 1 && n[2] == 0):
                             break;
                         default:
                             Aoi2Message.TryAdd(bytes, bytes);
@@ -1583,14 +1591,21 @@ namespace SignalForward
                             var destination4 = value.Bytes2.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
+                            KeyValuePair<byte[], byte[]> bb = default;
+                            KeyValuePair<byte[], byte[]> bb1 = default;
+                            KeyValuePair<byte[], byte[]> cc = default;
+                            KeyValuePair<byte[], byte[]> cc1 = default;
+                            var isSenndTakePhoto = false;
+                            var isSenndResult = true;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
                             {
-                                byte[] a = default;
-                                byte[] a1 = default;
-                                KeyValuePair<byte[], byte[]> b = default;
-                                KeyValuePair<byte[], byte[]> b1 = default;
-                                KeyValuePair<byte[], byte[]> c = default;
-                                KeyValuePair<byte[], byte[]> c1 = default;
+                                //byte[] a = default;
+                                //byte[] a1 = default;
+
+                                //KeyValuePair<byte[], byte[]> b = default;
+                                //KeyValuePair<byte[], byte[]> b1 = default;
+                                //KeyValuePair<byte[], byte[]> c = default;
+                                //KeyValuePair<byte[], byte[]> c1 = default;
 
                                 //拍照中
                                 //LockMethod(() =>
@@ -1623,7 +1638,7 @@ namespace SignalForward
                                 //拍照完成
                                 //LockMethod(() =>
                                 //{
-                                b = Aoi1Message.Where(item =>
+                                bb = Aoi1Message.Where(item =>
                                 item.Key[2] == 1 && item.Value.Skip(34).Take(44 - 34).ToArray()
                                    .SequenceEqual(destination3)).FirstOrDefault();
 
@@ -1635,7 +1650,7 @@ namespace SignalForward
 
                                 //LockMethod1(() =>
                                 //{
-                                b1 = Aoi2Message.Where(item =>
+                                bb1 = Aoi2Message.Where(item =>
                                 item.Key[2] == 1 && item.Value.Skip(34).Take(44 - 34).ToArray()
                                 .SequenceEqual(destination4)).FirstOrDefault();
 
@@ -1645,7 +1660,7 @@ namespace SignalForward
                                 //);
                                 //});
 
-                                if (!b.Equals(default(KeyValuePair<byte[], byte[]>)) && !b1.Equals(default(KeyValuePair<byte[], byte[]>)))
+                                if (!bb.Equals(default(KeyValuePair<byte[], byte[]>)) && !bb1.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
                                     var re = new byte[value.BytesOriginal.Length];
                                     Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
@@ -1653,6 +1668,7 @@ namespace SignalForward
                                     re[2] = 1;
                                     re[3] = 0;
                                     _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    isSenndTakePhoto = true;
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
@@ -1660,19 +1676,19 @@ namespace SignalForward
 
                                     //LockMethod(() => {
                                     //Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
-                                    Aoi1Message.TryRemove(b.Key, out _);
+                                    Aoi1Message.TryRemove(bb.Key, out _);
                                     //});
                                     //LockMethod1(() =>
                                     //{
                                     //Aoi2Message.RemoveAll(item => item.SequenceEqual(b1));
-                                    Aoi2Message.TryRemove(b1.Key, out _);
+                                    Aoi2Message.TryRemove(bb1.Key, out _);
                                     //});
                                 }
 
                                 //检测完成
                                 //LockMethod(() =>
                                 //{
-                                c = Aoi1Message.Where(item =>
+                                cc = Aoi1Message.Where(item =>
                              item.Key[2] == 2 && item.Value.Skip(34).Take(44 - 34).ToArray()
                                  .SequenceEqual(destination3)
                                ).FirstOrDefault();
@@ -1684,7 +1700,7 @@ namespace SignalForward
 
                                 //LockMethod1(() =>
                                 //{
-                                c1 = Aoi2Message.Where(item =>
+                                cc1 = Aoi2Message.Where(item =>
                             item.Key[2] == 2 && item.Value.Skip(34).Take(44 - 34).ToArray()
                                 .SequenceEqual(destination4)
                         ).FirstOrDefault();
@@ -1694,7 +1710,7 @@ namespace SignalForward
                                 //);
                                 //});
 
-                                if (!c.Equals(default(KeyValuePair<byte[], byte[]>)) && !c1.Equals(default(KeyValuePair<byte[], byte[]>)))
+                                if (!cc.Equals(default(KeyValuePair<byte[], byte[]>)) && !cc1.Equals(default(KeyValuePair<byte[], byte[]>)))
                                 {
                                     var re = new byte[value.BytesOriginal.Length];
                                     Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
@@ -1704,18 +1720,66 @@ namespace SignalForward
                                     switch (value.ty)
                                     {
                                         case 1:
-                                            re[9] = c.Value[9];
-                                            re[10] = c.Value[10];
+                                            re[9] = cc.Value[9];
+                                            re[10] = cc.Value[10];
                                             break;
                                         case 2:
-                                            re[11] = c1.Value[9];
-                                            re[12] = c1.Value[10];
+                                            re[11] = cc1.Value[9];
+                                            re[12] = cc1.Value[10];
                                             break;
                                         case 3:
-                                            re[9] = c.Value[9];
-                                            re[10] = c.Value[10];
-                                            re[11] = c1.Value[9];
-                                            re[12] = c1.Value[10];
+                                            re[9] = cc.Value[9];
+                                            re[10] = cc.Value[10];
+                                            re[11] = cc1.Value[9];
+                                            re[12] = cc1.Value[10];
+                                            break;
+                                    }
+
+                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    isSenndResult = false;
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info(re);
+                                    Logger?.Info("----------------------------------------------------");
+                                    complete = false;
+
+                                    //LockMethod(() => {
+                                    //Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
+                                    Aoi1Message.TryRemove(cc.Key, out _);
+                                    //});
+                                    //LockMethod1(() => {
+                                    //Aoi2Message.RemoveAll(item => item.SequenceEqual(c1));
+                                    Aoi2Message.TryRemove(cc1.Key, out _);
+                                    //});
+                                }
+
+                                var afterDt = DateTime.Now;
+                                var ts = afterDt.Subtract(beforeDt);
+                                timeOut = ts.Ticks / 10000;
+                            }
+                            if (isSenndTakePhoto && isSenndResult)
+                            {
+                                if (!cc.Equals(default(KeyValuePair<byte[], byte[]>)) && cc1.Equals(default(KeyValuePair<byte[], byte[]>)))
+                                {
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
+                                    re[1] = 1;
+                                    re[2] = 2;
+                                    re[3] = 0;
+                                    switch (value.ty)
+                                    {
+                                        case 1:
+                                            re[9] = cc.Value[9];
+                                            re[10] = cc.Value[10];
+                                            break;
+                                        case 2:
+                                            re[11] = cc1.Value[9];
+                                            re[12] = cc1.Value[10];
+                                            break;
+                                        case 3:
+                                            re[9] = cc.Value[9];
+                                            re[10] = cc.Value[10];
+                                            re[11] = 1;
+                                            re[12] = 2;
                                             break;
                                     }
 
@@ -1725,19 +1789,40 @@ namespace SignalForward
                                     Logger?.Info("----------------------------------------------------");
                                     complete = false;
 
-                                    //LockMethod(() => {
-                                    //Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
-                                    Aoi1Message.TryRemove(c.Key, out _);
-                                    //});
-                                    //LockMethod1(() => {
-                                    //Aoi2Message.RemoveAll(item => item.SequenceEqual(c1));
-                                    Aoi2Message.TryRemove(c1.Key, out _);
-                                    //});
+                                    Aoi1Message.TryRemove(cc.Key, out _);
                                 }
+                                else if (cc.Equals(default(KeyValuePair<byte[], byte[]>)) && !cc1.Equals(default(KeyValuePair<byte[], byte[]>)))
+                                {
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
+                                    re[1] = 1;
+                                    re[2] = 2;
+                                    re[3] = 0;
+                                    switch (value.ty)
+                                    {
+                                        case 1:
+                                            re[9] = cc.Value[9];
+                                            re[10] = cc.Value[10];
+                                            break;
+                                        case 2:
+                                            re[11] = cc1.Value[9];
+                                            re[12] = cc1.Value[10];
+                                            break;
+                                        case 3:
+                                            re[9] = 1;
+                                            re[10] = 2;
+                                            re[11] = cc1.Value[9];
+                                            re[12] = cc1.Value[10];
+                                            break;
+                                    }
 
-                                var afterDt = DateTime.Now;
-                                var ts = afterDt.Subtract(beforeDt);
-                                timeOut = ts.Ticks / 10000;
+                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info(re);
+                                    Logger?.Info("----------------------------------------------------");
+                                    complete = false;
+                                    Aoi2Message.TryRemove(cc1.Key, out _);
+                                }
                             }
                             //RemoveQueue.Enqueue(value);
                             break;
@@ -2572,6 +2657,7 @@ namespace SignalForward
             json.Add("Aoi2Ip", Aoi2Ip.Text);
             json.Add("Aoi2Port", Aoi2Port.Text);
             json.Add("PassWord", passWord);
+            json.Add("IsUse", IsUse);
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -2622,6 +2708,7 @@ namespace SignalForward
                     Aoi2Ip.Text = jsonNode!["Aoi2Ip"]!.GetValue<string>();
                     Aoi2Port.Text = jsonNode!["Aoi2Port"]!.GetValue<string>();
                     passWord = jsonNode!["PassWord"]!.GetValue<string>();
+                    IsUse = jsonNode!["IsUse"]!.GetValue<bool>();
                     return true;
                 }
                 return false;
