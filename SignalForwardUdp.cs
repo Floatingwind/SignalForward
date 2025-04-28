@@ -336,27 +336,27 @@ namespace SignalForward
                                         newBytes[44 + i] = data2[i];
                                     }
 
-                                    var newBytes1 = new byte[128];
-                                    newBytes1[3] = 1;
-                                    if (IsUse)
-                                    {
-                                        newBytes1[20] = 1;
-                                    }
-                                    var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
-                                    var id = GetBytes();
-                                    for (var i = 0; i < data1.Length; i++)
-                                    {
-                                        newBytes1[34 + i] = id[i];
-                                    }
+                                    //var newBytes1 = new byte[128];
+                                    //newBytes1[3] = 1;
+                                    //if (IsUse)
+                                    //{
+                                    //    newBytes1[20] = 1;
+                                    //}
+                                    //var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    //var id = GetBytes();
+                                    //for (var i = 0; i < data1.Length; i++)
+                                    //{
+                                    //    newBytes1[34 + i] = id[i];
+                                    //}
 
-                                    if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes1);
+                                    //if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes1);
 
                                     if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes);
                                     var datas = new PendingData();
-                                    datas.Type = 3;
+                                    datas.Type = 1;
                                     datas.ty = 1;
                                     datas.Bytes1 = newBytes;
-                                    datas.Bytes2 = newBytes1;
+                                    //datas.Bytes2 = newBytes1;
                                     datas.BytesOriginal = dataBytes;
                                     RemoteQueue?.Enqueue(datas);
                                 }
@@ -378,25 +378,25 @@ namespace SignalForward
                                         newBytes[44 + i] = data2[i];
                                     }
 
-                                    var newBytes1 = new byte[128];
-                                    newBytes1[3] = 1;
-                                    if (IsUse)
-                                    {
-                                        newBytes1[20] = 1;
-                                    }
-                                    var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
-                                    var id = GetBytes();
-                                    for (var i = 0; i < data1.Length; i++)
-                                    {
-                                        newBytes1[34 + i] = id[i];
-                                    }
-                                    if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes1);
+                                    //var newBytes1 = new byte[128];
+                                    //newBytes1[3] = 1;
+                                    //if (IsUse)
+                                    //{
+                                    //    newBytes1[20] = 1;
+                                    //}
+                                    //var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                    //var id = GetBytes();
+                                    //for (var i = 0; i < data1.Length; i++)
+                                    //{
+                                    //    newBytes1[34 + i] = id[i];
+                                    //}
+                                    //if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes1);
 
                                     if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes);
                                     var datas = new PendingData();
-                                    datas.Type = 3;
+                                    datas.Type = 2;
                                     datas.ty = 2;
-                                    datas.Bytes1 = newBytes1;
+                                    //datas.Bytes1 = newBytes1;
                                     datas.Bytes2 = newBytes;
                                     datas.BytesOriginal = dataBytes;
                                     RemoteQueue?.Enqueue(datas);
