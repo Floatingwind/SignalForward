@@ -1772,8 +1772,8 @@ namespace SignalForward
                                             re[10] = cc.Value[10];
                                             break;
                                         case 2:
-                                            re[11] = cc1.Value[9];
-                                            re[12] = cc1.Value[10];
+                                            re[11] = 1;
+                                            re[12] = 2;
                                             break;
                                         case 3:
                                             re[9] = cc.Value[9];
@@ -1801,8 +1801,8 @@ namespace SignalForward
                                     switch (value.ty)
                                     {
                                         case 1:
-                                            re[9] = cc.Value[9];
-                                            re[10] = cc.Value[10];
+                                            re[9] = 1;
+                                            re[10] = 2;
                                             break;
                                         case 2:
                                             re[11] = cc1.Value[9];
@@ -1822,6 +1822,39 @@ namespace SignalForward
                                     Logger?.Info("----------------------------------------------------");
                                     complete = false;
                                     Aoi2Message.TryRemove(cc1.Key, out _);
+                                }
+                                else
+                                {
+
+                                    var re = new byte[value.BytesOriginal.Length];
+                                    Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
+                                    re[1] = 1;
+                                    re[2] = 2;
+                                    re[3] = 0;
+                                    switch (value.ty)
+                                    {
+                                        case 1:
+                                            re[9] = 1;
+                                            re[10] = 2;
+                                            break;
+                                        case 2:
+                                            re[11] = 1;
+                                            re[12] = 2;
+                                            break;
+                                        case 3:
+                                            re[9] = 1;
+                                            re[10] = 2;
+                                            re[11] = 1;
+                                            re[12] = 2;
+                                            break;
+                                    }
+
+                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
+                                    Logger?.Info(re);
+                                    Logger?.Info("----------------------------------------------------");
+                                    complete = false;
+                                    //Aoi2Message.TryRemove(cc1.Key, out _);
                                 }
                             }
                             //RemoveQueue.Enqueue(value);
