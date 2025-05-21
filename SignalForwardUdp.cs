@@ -1772,14 +1772,14 @@ namespace SignalForward
                                             re[10] = cc.Value[10];
                                             break;
                                         case 2:
-                                            re[11] = 1;
-                                            re[12] = 2;
+                                            re[11] = 2;
+                                            re[12] = 3;
                                             break;
                                         case 3:
                                             re[9] = cc.Value[9];
                                             re[10] = cc.Value[10];
-                                            re[11] = 1;
-                                            re[12] = 2;
+                                            re[11] = 2;
+                                            re[12] = 3;
                                             break;
                                     }
 
@@ -1801,16 +1801,16 @@ namespace SignalForward
                                     switch (value.ty)
                                     {
                                         case 1:
-                                            re[9] = 1;
-                                            re[10] = 2;
+                                            re[9] = 2;
+                                            re[10] = 3;
                                             break;
                                         case 2:
                                             re[11] = cc1.Value[9];
                                             re[12] = cc1.Value[10];
                                             break;
                                         case 3:
-                                            re[9] = 1;
-                                            re[10] = 2;
+                                            re[9] = 2;
+                                            re[10] = 3;
                                             re[11] = cc1.Value[9];
                                             re[12] = cc1.Value[10];
                                             break;
@@ -1834,18 +1834,18 @@ namespace SignalForward
                                     switch (value.ty)
                                     {
                                         case 1:
-                                            re[9] = 1;
-                                            re[10] = 2;
+                                            re[9] = 2;
+                                            re[10] = 3;
                                             break;
                                         case 2:
-                                            re[11] = 1;
-                                            re[12] = 2;
+                                            re[11] = 2;
+                                            re[12] = 3;
                                             break;
                                         case 3:
-                                            re[9] = 1;
-                                            re[10] = 2;
-                                            re[11] = 1;
-                                            re[12] = 2;
+                                            re[9] = 2;
+                                            re[10] = 3;
+                                            re[11] = 2;
+                                            re[12] = 3;
                                             break;
                                     }
 
