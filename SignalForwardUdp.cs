@@ -103,6 +103,10 @@ namespace SignalForward
 
         public bool IsUse = false;
 
+        public byte WaiGuan = 2;
+
+        public byte Color = 3;
+
         #endregion 变量
 
         public SignalForwardUdp()
@@ -1772,14 +1776,14 @@ namespace SignalForward
                                             re[10] = cc.Value[10];
                                             break;
                                         case 2:
-                                            re[11] = 2;
-                                            re[12] = 3;
+                                            re[11] = WaiGuan;
+                                            re[12] = Color;
                                             break;
                                         case 3:
                                             re[9] = cc.Value[9];
                                             re[10] = cc.Value[10];
-                                            re[11] = 2;
-                                            re[12] = 3;
+                                            re[11] = WaiGuan;
+                                            re[12] = Color;
                                             break;
                                     }
 
@@ -1801,16 +1805,16 @@ namespace SignalForward
                                     switch (value.ty)
                                     {
                                         case 1:
-                                            re[9] = 2;
-                                            re[10] = 3;
+                                            re[9] = WaiGuan;
+                                            re[10] = Color;
                                             break;
                                         case 2:
                                             re[11] = cc1.Value[9];
                                             re[12] = cc1.Value[10];
                                             break;
                                         case 3:
-                                            re[9] = 2;
-                                            re[10] = 3;
+                                            re[9] = WaiGuan;
+                                            re[10] = Color;
                                             re[11] = cc1.Value[9];
                                             re[12] = cc1.Value[10];
                                             break;
@@ -1834,18 +1838,18 @@ namespace SignalForward
                                     switch (value.ty)
                                     {
                                         case 1:
-                                            re[9] = 2;
-                                            re[10] = 3;
+                                            re[9] = WaiGuan;
+                                            re[10] = Color;
                                             break;
                                         case 2:
-                                            re[11] = 2;
-                                            re[12] = 3;
+                                            re[11] = WaiGuan;
+                                            re[12] = Color;
                                             break;
                                         case 3:
-                                            re[9] = 2;
-                                            re[10] = 3;
-                                            re[11] = 2;
-                                            re[12] = 3;
+                                            re[9] = WaiGuan;
+                                            re[10] = Color;
+                                            re[11] = WaiGuan;
+                                            re[12] = Color;
                                             break;
                                     }
 
@@ -2691,6 +2695,8 @@ namespace SignalForward
             json.Add("Aoi2Port", Aoi2Port.Text);
             json.Add("PassWord", passWord);
             json.Add("IsUse", IsUse);
+            json.Add("WaiGuan", WaiGuan);
+            json.Add("Color", Color);
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -2742,6 +2748,8 @@ namespace SignalForward
                     Aoi2Port.Text = jsonNode!["Aoi2Port"]!.GetValue<string>();
                     passWord = jsonNode!["PassWord"]!.GetValue<string>();
                     IsUse = jsonNode!["IsUse"]!.GetValue<bool>();
+                    WaiGuan = jsonNode!["WaiGuan"]!.GetValue<byte>();
+                    Color = jsonNode!["Color"]!.GetValue<byte>();
                     return true;
                 }
                 return false;
