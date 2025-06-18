@@ -103,9 +103,23 @@ namespace SignalForward
 
         public bool IsUse = false;
 
+        /// <summary>
+        /// 外观
+        /// </summary>
         public byte WaiGuan = 2;
 
+        /// <summary>
+        /// 颜色
+        /// </summary>
         public byte Color = 3;
+
+        public int StartIndex = 80;
+
+        public int Length = 20;
+
+        public int StartIndex1 = 100;
+
+        public int Length1 = 20;
 
         #endregion 变量
 
@@ -334,7 +348,7 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
-                                    var data2 = dataBytes.Skip(80).Take(100 - 80).ToArray();
+                                    var data2 = dataBytes.Skip(StartIndex).Take(Length).ToArray();
                                     for (var i = 0; i < data2.Length; i++)
                                     {
                                         newBytes[44 + i] = data2[i];
@@ -376,7 +390,7 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
-                                    var data2 = dataBytes.Skip(100).Take(120 - 100).ToArray();
+                                    var data2 = dataBytes.Skip(StartIndex1).Take(Length1).ToArray();
                                     for (var i = 0; i < data2.Length; i++)
                                     {
                                         newBytes[44 + i] = data2[i];
@@ -418,7 +432,7 @@ namespace SignalForward
                                     {
                                         newBytes[34 + i] = data[i];
                                     }
-                                    var data2 = dataBytes.Skip(80).Take(100 - 80).ToArray();
+                                    var data2 = dataBytes.Skip(StartIndex).Take(Length).ToArray();
                                     for (var i = 0; i < data2.Length; i++)
                                     {
                                         newBytes[44 + i] = data2[i];
@@ -431,7 +445,7 @@ namespace SignalForward
                                     {
                                         newBytes1[34 + i] = data1[i];
                                     }
-                                    var data3 = dataBytes.Skip(100).Take(120 - 100).ToArray();
+                                    var data3 = dataBytes.Skip(StartIndex1).Take(Length1).ToArray();
                                     for (var i = 0; i < data3.Length; i++)
                                     {
                                         newBytes1[44 + i] = data3[i];
@@ -2697,6 +2711,10 @@ namespace SignalForward
             json.Add("IsUse", IsUse);
             json.Add("WaiGuan", WaiGuan);
             json.Add("Color", Color);
+            json.Add("StartIndex", StartIndex);
+            json.Add("Length", Length);
+            json.Add("StartIndex1", StartIndex1);
+            json.Add("Length1", Length1);
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -2750,6 +2768,10 @@ namespace SignalForward
                     IsUse = jsonNode!["IsUse"]!.GetValue<bool>();
                     WaiGuan = jsonNode!["WaiGuan"]!.GetValue<byte>();
                     Color = jsonNode!["Color"]!.GetValue<byte>();
+                    StartIndex = jsonNode!["StartIndex"]!.GetValue<int>();
+                    Length = jsonNode!["Length"]!.GetValue<int>();
+                    StartIndex1 = jsonNode!["StartIndex1"]!.GetValue<int>();
+                    Length1 = jsonNode!["Length1"]!.GetValue<int>();
                     return true;
                 }
                 return false;
