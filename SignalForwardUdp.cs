@@ -121,6 +121,8 @@ namespace SignalForward
 
         public int Length1 = 20;
 
+        public bool OneTakePhoto = false;
+
         #endregion 变量
 
         public SignalForwardUdp()
@@ -367,16 +369,30 @@ namespace SignalForward
                                         newBytes1[34 + i] = id[i];
                                     }
 
-                                    if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes1);
+                                    if (OneTakePhoto)
+                                    {
+                                        if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes);
+                                        var datas = new PendingData();
+                                        datas.Type = 1;
+                                        datas.ty = 1;
+                                        datas.Bytes1 = newBytes;
+                                        datas.Bytes2 = newBytes1;
+                                        datas.BytesOriginal = dataBytes;
+                                        RemoteQueue?.Enqueue(datas);
+                                    }
+                                    else
+                                    {
+                                        if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes1);
 
-                                    if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes);
-                                    var datas = new PendingData();
-                                    datas.Type = 3;
-                                    datas.ty = 1;
-                                    datas.Bytes1 = newBytes;
-                                    datas.Bytes2 = newBytes1;
-                                    datas.BytesOriginal = dataBytes;
-                                    RemoteQueue?.Enqueue(datas);
+                                        if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes);
+                                        var datas = new PendingData();
+                                        datas.Type = 3;
+                                        datas.ty = 1;
+                                        datas.Bytes1 = newBytes;
+                                        datas.Bytes2 = newBytes1;
+                                        datas.BytesOriginal = dataBytes;
+                                        RemoteQueue?.Enqueue(datas);
+                                    }
                                 }
                                 break;
 
@@ -408,16 +424,29 @@ namespace SignalForward
                                     {
                                         newBytes1[34 + i] = id[i];
                                     }
-                                    if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes1);
-
-                                    if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes);
-                                    var datas = new PendingData();
-                                    datas.Type = 3;
-                                    datas.ty = 2;
-                                    datas.Bytes1 = newBytes1;
-                                    datas.Bytes2 = newBytes;
-                                    datas.BytesOriginal = dataBytes;
-                                    RemoteQueue?.Enqueue(datas);
+                                    if (OneTakePhoto)
+                                    {
+                                        if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes);
+                                        var datas = new PendingData();
+                                        datas.Type = 2;
+                                        datas.ty = 2;
+                                        datas.Bytes1 = newBytes1;
+                                        datas.Bytes2 = newBytes;
+                                        datas.BytesOriginal = dataBytes;
+                                        RemoteQueue?.Enqueue(datas);
+                                    }
+                                    else
+                                    {
+                                        if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes1);
+                                        if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes);
+                                        var datas = new PendingData();
+                                        datas.Type = 3;
+                                        datas.ty = 2;
+                                        datas.Bytes1 = newBytes1;
+                                        datas.Bytes2 = newBytes;
+                                        datas.BytesOriginal = dataBytes;
+                                        RemoteQueue?.Enqueue(datas);
+                                    }
                                 }
                                 break;
 
@@ -451,8 +480,8 @@ namespace SignalForward
                                         newBytes1[44 + i] = data3[i];
                                     }
 
-                                    if (_aoi1PortEndPoint != null) _localUdp?.SendAsync(_aoi1PortEndPoint, newBytes);
-                                    if (_aoi2PortEndPoint != null) _localUdp1?.SendAsync(_aoi2PortEndPoint, newBytes1);
+                                    if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes);
+                                    if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes1);
                                     var datas = new PendingData();
                                     datas.Type = 3;
                                     datas.ty = 3;
@@ -523,8 +552,10 @@ namespace SignalForward
 
                         case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
                             break;
+
                         case byte[] n when (n[0] == 0 && n[1] == 1 && n[2] == 0):
                             break;
+
                         default:
                             Aoi1Message.TryAdd(bytes, bytes);
                             Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
@@ -636,8 +667,10 @@ namespace SignalForward
 
                         case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
                             break;
+
                         case byte[] n when (n[0] == 0 && n[1] == 1 && n[2] == 0):
                             break;
+
                         default:
                             Aoi2Message.TryAdd(bytes, bytes);
                             Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
@@ -1469,7 +1502,7 @@ namespace SignalForward
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
@@ -1497,7 +1530,7 @@ namespace SignalForward
                                     re[3] = 0;
                                     re[9] = c.Value[9];
                                     re[10] = c.Value[10];
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
@@ -1559,7 +1592,7 @@ namespace SignalForward
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
@@ -1587,7 +1620,7 @@ namespace SignalForward
                                     re[3] = 0;
                                     re[11] = c.Value[9];
                                     re[12] = c.Value[10];
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
@@ -1685,7 +1718,7 @@ namespace SignalForward
                                     re[1] = 1;
                                     re[2] = 1;
                                     re[3] = 0;
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     isSenndTakePhoto = true;
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
                                     Logger?.Info(re);
@@ -1741,10 +1774,12 @@ namespace SignalForward
                                             re[9] = cc.Value[9];
                                             re[10] = cc.Value[10];
                                             break;
+
                                         case 2:
                                             re[11] = cc1.Value[9];
                                             re[12] = cc1.Value[10];
                                             break;
+
                                         case 3:
                                             re[9] = cc.Value[9];
                                             re[10] = cc.Value[10];
@@ -1753,7 +1788,7 @@ namespace SignalForward
                                             break;
                                     }
 
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     isSenndResult = false;
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
@@ -1789,10 +1824,12 @@ namespace SignalForward
                                             re[9] = cc.Value[9];
                                             re[10] = cc.Value[10];
                                             break;
+
                                         case 2:
                                             re[11] = WaiGuan;
                                             re[12] = Color;
                                             break;
+
                                         case 3:
                                             re[9] = cc.Value[9];
                                             re[10] = cc.Value[10];
@@ -1801,7 +1838,7 @@ namespace SignalForward
                                             break;
                                     }
 
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
@@ -1822,10 +1859,12 @@ namespace SignalForward
                                             re[9] = WaiGuan;
                                             re[10] = Color;
                                             break;
+
                                         case 2:
                                             re[11] = cc1.Value[9];
                                             re[12] = cc1.Value[10];
                                             break;
+
                                         case 3:
                                             re[9] = WaiGuan;
                                             re[10] = Color;
@@ -1834,7 +1873,7 @@ namespace SignalForward
                                             break;
                                     }
 
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
@@ -1843,7 +1882,6 @@ namespace SignalForward
                                 }
                                 else
                                 {
-
                                     var re = new byte[value.BytesOriginal.Length];
                                     Array.Copy(value.BytesOriginal, re, value.BytesOriginal.Length);
                                     re[1] = 1;
@@ -1855,10 +1893,12 @@ namespace SignalForward
                                             re[9] = WaiGuan;
                                             re[10] = Color;
                                             break;
+
                                         case 2:
                                             re[11] = WaiGuan;
                                             re[12] = Color;
                                             break;
+
                                         case 3:
                                             re[9] = WaiGuan;
                                             re[10] = Color;
@@ -1867,7 +1907,7 @@ namespace SignalForward
                                             break;
                                     }
 
-                                    _remoteUdp?.SendAsync(_plcIpEndPoint, re);
+                                    _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
                                     Logger?.Info(re);
                                     Logger?.Info("----------------------------------------------------");
@@ -2715,6 +2755,7 @@ namespace SignalForward
             json.Add("Length", Length);
             json.Add("StartIndex1", StartIndex1);
             json.Add("Length1", Length1);
+            json.Add("OneTakePhoto", OneTakePhoto);
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -2772,6 +2813,7 @@ namespace SignalForward
                     Length = jsonNode!["Length"]!.GetValue<int>();
                     StartIndex1 = jsonNode!["StartIndex1"]!.GetValue<int>();
                     Length1 = jsonNode!["Length1"]!.GetValue<int>();
+                    OneTakePhoto = jsonNode!["OneTakePhoto"]!.GetValue<bool>();
                     return true;
                 }
                 return false;
@@ -2930,4 +2972,3 @@ namespace SignalForward
         public byte[] BytesOriginal { get; set; }
     }
 }
-

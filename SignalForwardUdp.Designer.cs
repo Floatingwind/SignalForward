@@ -524,7 +524,7 @@
             this.numericUpDown1.Size = new System.Drawing.Size(78, 23);
             this.numericUpDown1.TabIndex = 3;
             this.numericUpDown1.Value = new decimal(new int[] {
-            600,
+            1000,
             0,
             0,
             0});
@@ -630,7 +630,7 @@
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(40, 17);
             this.label19.TabIndex = 8;
-            this.label19.Text = "V1.34";
+            this.label19.Text = "V1.35";
             // 
             // SignalForwardUdp
             // 
