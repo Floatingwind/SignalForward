@@ -322,186 +322,200 @@ namespace SignalForward
                 _timeout1 = (int)numericUpDown2.Value;
                 _remoteUdp.DataReceived += (object? sender, byte[] dataBytes) =>
                 {
-                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
-                    Logger?.Info(dataBytes);
-                    Logger?.Info("----------------------------------------------------");
-                    if (_localUdp != null || _localUdp1 != null)
+                    try
                     {
-                        CurTime = DateTime.Now;
-                        if (CurTime.Subtract(BeforeTime).TotalSeconds > _timeout1)
+                        Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收自动化消息:");
+                        Logger?.Info(dataBytes);
+                        //Logger?.Info("----------------------------------------------------");
+                        if (_localUdp != null || _localUdp1 != null)
                         {
-                            Aoi1Message?.Clear();
+                            CurTime = DateTime.Now;
+                            if (CurTime.Subtract(BeforeTime).TotalSeconds > _timeout1)
+                            {
+                                Aoi1Message?.Clear();
 
-                            Aoi2Message?.Clear();
+                                Aoi2Message?.Clear();
 
-                            RemoteQueue?.Clear();
-                            Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}清除通讯数据缓存");
-                        }
-                        BeforeTime = CurTime;
-                        switch (dataBytes[66])
-                        {
-                            case 1:
-                                if (dataBytes[3] == 1)
-                                {
-                                    var newBytes = new byte[dataBytes.Length];
-                                    newBytes[3] = 1;
-                                    var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
-                                    for (var i = 0; i < data.Length; i++)
+                                RemoteQueue?.Clear();
+                                Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}清除通讯数据缓存");
+                            }
+                            BeforeTime = CurTime;
+                            var xinhao = dataBytes[66];
+                            var shifoupaizhao = dataBytes[3];
+                            switch (xinhao)
+                            {
+                                case 1:
+                                    if (shifoupaizhao == 1)
                                     {
-                                        newBytes[34 + i] = data[i];
+                                        var newBytes = new byte[dataBytes.Length];
+                                        newBytes[3] = 1;
+                                        var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                        for (var i = 0; i < data.Length; i++)
+                                        {
+                                            newBytes[34 + i] = data[i];
+                                        }
+                                        var data2 = dataBytes.Skip(StartIndex).Take(Length).ToArray();
+                                        for (var i = 0; i < data2.Length; i++)
+                                        {
+                                            newBytes[44 + i] = data2[i];
+                                        }
+                                        var newBytes1 = new byte[128];
+                                        newBytes1[3] = 1;
+                                        if (IsUse)
+                                        {
+                                            newBytes1[20] = 1;
+                                        }
+                                        var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                        var id = GetBytes();
+                                        for (var i = 0; i < data1.Length; i++)
+                                        {
+                                            newBytes1[34 + i] = id[i];
+                                        }
+                                        if (OneTakePhoto)
+                                        {
+                                            if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes);
+                                            Logger?.Info("O->AOI1");
+                                            var datas = new PendingData();
+                                            datas.Type = 1;
+                                            datas.ty = 1;
+                                            datas.Bytes1 = newBytes;
+                                            datas.Bytes2 = newBytes1;
+                                            datas.BytesOriginal = dataBytes;
+                                            RemoteQueue?.Enqueue(datas);
+                                        }
+                                        else
+                                        {
+                                            if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes1);
+                                            Logger?.Info("O->AOI2");
+                                            if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes);
+                                            Logger?.Info("O->AOI1");
+                                            var datas = new PendingData();
+                                            datas.Type = 3;
+                                            datas.ty = 1;
+                                            datas.Bytes1 = newBytes;
+                                            datas.Bytes2 = newBytes1;
+                                            datas.BytesOriginal = dataBytes;
+                                            RemoteQueue?.Enqueue(datas);
+                                        }
                                     }
-                                    var data2 = dataBytes.Skip(StartIndex).Take(Length).ToArray();
-                                    for (var i = 0; i < data2.Length; i++)
-                                    {
-                                        newBytes[44 + i] = data2[i];
-                                    }
+                                    break;
 
-                                    var newBytes1 = new byte[128];
-                                    newBytes1[3] = 1;
-                                    if (IsUse)
+                                case 2:
+                                    if (shifoupaizhao == 1)
                                     {
-                                        newBytes1[20] = 1;
-                                    }
-                                    var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
-                                    var id = GetBytes();
-                                    for (var i = 0; i < data1.Length; i++)
-                                    {
-                                        newBytes1[34 + i] = id[i];
-                                    }
+                                        var newBytes = new byte[dataBytes.Length];
+                                        newBytes[3] = 1;
+                                        var data = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                        for (var i = 0; i < data.Length; i++)
+                                        {
+                                            newBytes[34 + i] = data[i];
+                                        }
+                                        var data2 = dataBytes.Skip(StartIndex1).Take(Length1).ToArray();
+                                        for (var i = 0; i < data2.Length; i++)
+                                        {
+                                            newBytes[44 + i] = data2[i];
+                                        }
 
-                                    if (OneTakePhoto)
+                                        var newBytes1 = new byte[128];
+                                        newBytes1[3] = 1;
+                                        if (IsUse)
+                                        {
+                                            newBytes1[20] = 1;
+                                        }
+                                        var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                        var id = GetBytes();
+                                        for (var i = 0; i < data1.Length; i++)
+                                        {
+                                            newBytes1[34 + i] = id[i];
+                                        }
+                                        if (OneTakePhoto)
+                                        {
+                                            if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes);
+                                            Logger?.Info("O->AOI2");
+                                            var datas = new PendingData();
+                                            datas.Type = 2;
+                                            datas.ty = 2;
+                                            datas.Bytes1 = newBytes1;
+                                            datas.Bytes2 = newBytes;
+                                            datas.BytesOriginal = dataBytes;
+                                            RemoteQueue?.Enqueue(datas);
+                                        }
+                                        else
+                                        {
+                                            if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes1);
+                                            Logger?.Info("O->AOI1");
+                                            if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes);
+                                            Logger?.Info("O->AOI2");
+                                            var datas = new PendingData();
+                                            datas.Type = 3;
+                                            datas.ty = 2;
+                                            datas.Bytes1 = newBytes1;
+                                            datas.Bytes2 = newBytes;
+                                            datas.BytesOriginal = dataBytes;
+                                            RemoteQueue?.Enqueue(datas);
+                                        }
+                                    }
+                                    break;
+
+                                case 3:
+                                    if (shifoupaizhao == 1)
                                     {
+                                        var newBytes = new byte[dataBytes.Length];
+                                        newBytes[3] = 1;
+                                        newBytes[5] = 1;
+                                        var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
+                                        for (var i = 0; i < data.Length; i++)
+                                        {
+                                            newBytes[34 + i] = data[i];
+                                        }
+                                        var data2 = dataBytes.Skip(StartIndex).Take(Length).ToArray();
+                                        for (var i = 0; i < data2.Length; i++)
+                                        {
+                                            newBytes[44 + i] = data2[i];
+                                        }
+
+                                        var newBytes1 = new byte[128];
+                                        newBytes1[3] = 1;
+                                        var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
+                                        for (var i = 0; i < data1.Length; i++)
+                                        {
+                                            newBytes1[34 + i] = data1[i];
+                                        }
+                                        var data3 = dataBytes.Skip(StartIndex1).Take(Length1).ToArray();
+                                        for (var i = 0; i < data3.Length; i++)
+                                        {
+                                            newBytes1[44 + i] = data3[i];
+                                        }
+
                                         if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes);
-                                        var datas = new PendingData();
-                                        datas.Type = 1;
-                                        datas.ty = 1;
-                                        datas.Bytes1 = newBytes;
-                                        datas.Bytes2 = newBytes1;
-                                        datas.BytesOriginal = dataBytes;
-                                        RemoteQueue?.Enqueue(datas);
-                                    }
-                                    else
-                                    {
+                                        Logger?.Info("O->AOI1");
                                         if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes1);
-
-                                        if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes);
+                                        Logger?.Info("O->AOI2");
                                         var datas = new PendingData();
                                         datas.Type = 3;
-                                        datas.ty = 1;
+                                        datas.ty = 3;
                                         datas.Bytes1 = newBytes;
                                         datas.Bytes2 = newBytes1;
                                         datas.BytesOriginal = dataBytes;
                                         RemoteQueue?.Enqueue(datas);
                                     }
-                                }
-                                break;
+                                    break;
 
-                            case 2:
-                                if (dataBytes[3] == 1)
-                                {
-                                    var newBytes = new byte[dataBytes.Length];
-                                    newBytes[3] = 1;
-                                    var data = dataBytes.Skip(44).Take(54 - 44).ToArray();
-                                    for (var i = 0; i < data.Length; i++)
-                                    {
-                                        newBytes[34 + i] = data[i];
-                                    }
-                                    var data2 = dataBytes.Skip(StartIndex1).Take(Length1).ToArray();
-                                    for (var i = 0; i < data2.Length; i++)
-                                    {
-                                        newBytes[44 + i] = data2[i];
-                                    }
-
-                                    var newBytes1 = new byte[128];
-                                    newBytes1[3] = 1;
-                                    if (IsUse)
-                                    {
-                                        newBytes1[20] = 1;
-                                    }
-                                    var data1 = dataBytes.Skip(34).Take(44 - 34).ToArray();
-                                    var id = GetBytes();
-                                    for (var i = 0; i < data1.Length; i++)
-                                    {
-                                        newBytes1[34 + i] = id[i];
-                                    }
-                                    if (OneTakePhoto)
-                                    {
-                                        if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes);
-                                        var datas = new PendingData();
-                                        datas.Type = 2;
-                                        datas.ty = 2;
-                                        datas.Bytes1 = newBytes1;
-                                        datas.Bytes2 = newBytes;
-                                        datas.BytesOriginal = dataBytes;
-                                        RemoteQueue?.Enqueue(datas);
-                                    }
-                                    else
-                                    {
-                                        if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes1);
-                                        if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes);
-                                        var datas = new PendingData();
-                                        datas.Type = 3;
-                                        datas.ty = 2;
-                                        datas.Bytes1 = newBytes1;
-                                        datas.Bytes2 = newBytes;
-                                        datas.BytesOriginal = dataBytes;
-                                        RemoteQueue?.Enqueue(datas);
-                                    }
-                                }
-                                break;
-
-                            case 3:
-                                if (dataBytes[3] == 1)
-                                {
-                                    var newBytes = new byte[dataBytes.Length];
-                                    newBytes[3] = 1;
-                                    newBytes[5] = 1;
-                                    var data = dataBytes.Skip(34).Take(44 - 34).ToArray();
-                                    for (var i = 0; i < data.Length; i++)
-                                    {
-                                        newBytes[34 + i] = data[i];
-                                    }
-                                    var data2 = dataBytes.Skip(StartIndex).Take(Length).ToArray();
-                                    for (var i = 0; i < data2.Length; i++)
-                                    {
-                                        newBytes[44 + i] = data2[i];
-                                    }
-
-                                    var newBytes1 = new byte[128];
-                                    newBytes1[3] = 1;
-                                    var data1 = dataBytes.Skip(44).Take(54 - 44).ToArray();
-                                    for (var i = 0; i < data1.Length; i++)
-                                    {
-                                        newBytes1[34 + i] = data1[i];
-                                    }
-                                    var data3 = dataBytes.Skip(StartIndex1).Take(Length1).ToArray();
-                                    for (var i = 0; i < data3.Length; i++)
-                                    {
-                                        newBytes1[44 + i] = data3[i];
-                                    }
-
-                                    if (_aoi1PortEndPoint != null) _localUdp?.Send(_aoi1PortEndPoint, newBytes);
-                                    if (_aoi2PortEndPoint != null) _localUdp1?.Send(_aoi2PortEndPoint, newBytes1);
-                                    var datas = new PendingData();
-                                    datas.Type = 3;
-                                    datas.ty = 3;
-                                    datas.Bytes1 = newBytes;
-                                    datas.Bytes2 = newBytes1;
-                                    datas.BytesOriginal = dataBytes;
-                                    RemoteQueue?.Enqueue(datas);
-                                }
-                                break;
-
-                            default:
-                                Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
-                                Logger?.Info(dataBytes);
-                                Logger?.Info("----------------------------------------------------");
-                                break;
+                                default:
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}半片标识为0:");
+                                    Logger?.Info(dataBytes);
+                                    Logger?.Info("----------------------------------------------------");
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            Logger?.Info("本地连接AOI断开");
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Logger?.Info("本地连接AOI断开");
+                        Logger?.Error(ex.Message);
                     }
                 };
                 _remoteUdp.Start();
@@ -535,33 +549,70 @@ namespace SignalForward
                 _localUdp.DataReceived += (o, bytes) =>
                 {
                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI1消息:");
-                    Logger?.Info(bytes);
-                    Logger?.Info("----------------------------------------------------");
+                    //Logger?.Info(bytes);
+                    //Logger?.Info("----------------------------------------------------");
 
-                    switch (bytes)
+                    var wuyiyi = bytes[0];
+                    var jiuxu = bytes[1];
+                    var caozhuo = bytes[2];
+                    var liushuihao = bytes.Skip(34).Take(10);
+
+                    //switch (bytes)
+                    //{
+                    //    case byte[] n when n[1] == 1 && n[2] == 3:
+                    //        if (_remoteUdp != null || _plcIpEndPoint != null)
+                    //            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                    //        break;
+
+                    //    case byte[] n when n[1] == 0 && n[2] == 3:
+                    //        if (_remoteUdp != null || _plcIpEndPoint != null)
+                    //            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                    //        break;
+
+                    //    case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
+                    //        break;
+
+                    //    case byte[] n when (n[0] == 0 && n[1] == 1 && n[2] == 0):
+                    //        break;
+
+                    //    default:
+                    //        Aoi1Message.TryAdd(bytes, bytes);
+                    //        Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
+                    //        //Logger?.Info(bytes);
+                    //        //Logger?.Info("----------------------------------------------------");
+                    //        break;
+                    //}
+
+                    if (jiuxu == 1 && caozhuo == 3)
                     {
-                        case byte[] n when n[1] == 1 && n[2] == 3:
-                            if (_remoteUdp != null || _plcIpEndPoint != null)
-                                _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
-                            break;
-
-                        case byte[] n when n[1] == 0 && n[2] == 3:
-                            if (_remoteUdp != null || _plcIpEndPoint != null)
-                                _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
-                            break;
-
-                        case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
-                            break;
-
-                        case byte[] n when (n[0] == 0 && n[1] == 1 && n[2] == 0):
-                            break;
-
-                        default:
-                            Aoi1Message.TryAdd(bytes, bytes);
-                            Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
-                            Logger?.Info(bytes);
-                            Logger?.Info("----------------------------------------------------");
-                            break;
+                        if (_remoteUdp != null || _plcIpEndPoint != null)
+                            _remoteUdp?.Send(_plcIpEndPoint, bytes);
+                        Logger?.Info("发送启动信号");
+                        Logger?.Info(bytes);
+                    }
+                    else if (jiuxu == 0 && caozhuo == 3)
+                    {
+                        if (_remoteUdp != null || _plcIpEndPoint != null)
+                            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                        Logger?.Info("发送暂停信号");
+                        Logger?.Info(bytes);
+                    }
+                    else if ((caozhuo == 1 || caozhuo == 2 || caozhuo == 0) && (liushuihao.SequenceEqual(_moRen1)) || liushuihao.SequenceEqual(_moRen))
+                    {
+                        //Logger?.Info("AOI流水号为空");
+                        //Logger?.Info(bytes);
+                        Logger?.Info("...");
+                    }
+                    else if (wuyiyi == 0 && jiuxu == 1 && caozhuo == 0)
+                    {
+                        Logger?.Info("....");
+                        //Logger?.Info(bytes);
+                    }
+                    else
+                    {
+                        Logger?.Info(".....");
+                        Aoi1Message.TryAdd(bytes, bytes);
+                        Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
                     }
 
                     //if (bytes[1] == 1 && bytes[2] == 3) //&& bytes.Skip(34).Take(10).SequenceEqual(_moRen1)
@@ -650,34 +701,39 @@ namespace SignalForward
                 _localUdp1.DataReceived += (o, bytes) =>
                 {
                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}接收AOI2消息:");
-                    Logger?.Info(bytes);
-                    Logger?.Info("----------------------------------------------------");
+                    //Logger?.Info(bytes);
+                    //Logger?.Info("----------------------------------------------------");
 
-                    switch (bytes)
-                    {
-                        case byte[] n when n[1] == 1 && n[2] == 3:
-                            if (_remoteUdp != null || _plcIpEndPoint != null)
-                                _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
-                            break;
+                    var wuyiyi = bytes[0];
+                    var jiuxu = bytes[1];
+                    var caozhuo = bytes[2];
+                    var liushuihao = bytes.Skip(34).Take(10);
 
-                        case byte[] n when n[1] == 0 && n[2] == 3:
-                            if (_remoteUdp != null || _plcIpEndPoint != null)
-                                _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
-                            break;
+                    //switch (bytes)
+                    //{
+                    //    case byte[] n when n[1] == 1 && n[2] == 3:
+                    //        if (_remoteUdp != null || _plcIpEndPoint != null)
+                    //            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                    //        break;
 
-                        case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
-                            break;
+                    //    case byte[] n when n[1] == 0 && n[2] == 3:
+                    //        if (_remoteUdp != null || _plcIpEndPoint != null)
+                    //            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                    //        break;
 
-                        case byte[] n when (n[0] == 0 && n[1] == 1 && n[2] == 0):
-                            break;
+                    //    case byte[] n when (n[2] == 1 || n[2] == 2 || n[2] == 0) && (n.Skip(34).Take(10).SequenceEqual(_moRen1) || n.Skip(34).Take(10).SequenceEqual(_moRen)):
+                    //        break;
 
-                        default:
-                            Aoi2Message.TryAdd(bytes, bytes);
-                            Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
-                            Logger?.Info(bytes);
-                            Logger?.Info("----------------------------------------------------");
-                            break;
-                    }
+                    //    case byte[] n when (n[0] == 0 && n[1] == 1 && n[2] == 0):
+                    //        break;
+
+                    //    default:
+                    //        Aoi2Message.TryAdd(bytes, bytes);
+                    //        Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
+                    //        //Logger?.Info(bytes);
+                    //        //Logger?.Info("----------------------------------------------------");
+                    //        break;
+                    //}
 
                     //if (bytes[1] == 1 && bytes[2] == 3) //&& bytes.Skip(34).Take(10).SequenceEqual(_moRen1)
                     //{
@@ -703,6 +759,36 @@ namespace SignalForward
                     //    Logger?.Info(bytes);
                     //    Logger?.Info("----------------------------------------------------");
                     //}
+
+
+                    if (jiuxu == 1 && caozhuo == 3)
+                    {
+                        if (_remoteUdp != null || _plcIpEndPoint != null)
+                            _remoteUdp?.Send(_plcIpEndPoint, bytes);
+                        Logger?.Info("发送启动信号");
+                        Logger?.Info(bytes);
+                    }
+                    else if (jiuxu == 0 && caozhuo == 3)
+                    {
+                        if (_remoteUdp != null || _plcIpEndPoint != null)
+                            _remoteUdp?.SendAsync(_plcIpEndPoint, bytes);
+                        Logger?.Info("发送暂停信号");
+                        Logger?.Info(bytes);
+                    }
+                    else if ((caozhuo == 1 || caozhuo == 2 || caozhuo == 0) && (liushuihao.SequenceEqual(_moRen1)) || liushuihao.SequenceEqual(_moRen))
+                    {
+                        Logger?.Info("***");
+                    }
+                    else if (wuyiyi == 0 && jiuxu == 1 && caozhuo == 0)
+                    {
+                        Logger?.Info("****");
+                    }
+                    else
+                    {
+                        Logger?.Info("*****");
+                        Aoi2Message.TryAdd(bytes, bytes);
+                        Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
+                    }
                 };
                 _localUdp1.Start();
                 _timeout = ((int)numericUpDown1.Value);
@@ -1504,8 +1590,8 @@ namespace SignalForward
                                     re[3] = 0;
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    //Logger?.Info(re);
+                                    //Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
                                     // Aoi1Message.RemoveAll(item => item.SequenceEqual(b));
                                     Aoi1Message.TryRemove(b.Key, out _);
@@ -1531,9 +1617,9 @@ namespace SignalForward
                                     re[9] = c.Value[9];
                                     re[10] = c.Value[10];
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
-                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:{c.Value[9]},{c.Value[10]}");
+                                    //Logger?.Info(re);
+                                    //Logger?.Info("----------------------------------------------------");
                                     complete = false;
                                     //Aoi1Message.RemoveAll(item => item.SequenceEqual(c));
                                     Aoi1Message.TryRemove(c.Key, out _);
@@ -1594,8 +1680,8 @@ namespace SignalForward
                                     re[3] = 0;
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    //Logger?.Info(re);
+                                    //Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
                                     //Aoi2Message.RemoveAll(item => item.SequenceEqual(b));
                                     Aoi2Message.TryRemove(b.Key, out _);
@@ -1621,9 +1707,9 @@ namespace SignalForward
                                     re[11] = c.Value[9];
                                     re[12] = c.Value[10];
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
-                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:{c.Value[9]},{c.Value[10]}");
+                                    //Logger?.Info(re); 
+                                    //Logger?.Info("----------------------------------------------------");
                                     complete = false;
                                     //Aoi2Message.RemoveAll(item => item.SequenceEqual(c));
                                     Aoi2Message.TryRemove(c.Key, out _);
@@ -1721,8 +1807,8 @@ namespace SignalForward
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
                                     isSenndTakePhoto = true;
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}拍照完成O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    //Logger?.Info(re);
+                                    //Logger?.Info("----------------------------------------------------");
                                     photoCompleted = false;
 
                                     //LockMethod(() => {
@@ -1790,9 +1876,9 @@ namespace SignalForward
 
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
                                     isSenndResult = false;
-                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:{cc.Value[9]},{cc.Value[10]},{cc1.Value[9]},{cc1.Value[10]}");
+                                    //Logger?.Info(re);
+                                    //Logger?.Info("----------------------------------------------------");
                                     complete = false;
 
                                     //LockMethod(() => {
@@ -1837,11 +1923,10 @@ namespace SignalForward
                                             re[12] = Color;
                                             break;
                                     }
-
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
-                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:{cc.Value[9]},{cc.Value[10]},{WaiGuan},{Color}");
+                                    //Logger?.Info(re);
+                                    //Logger?.Info("----------------------------------------------------");
                                     complete = false;
 
                                     Aoi1Message.TryRemove(cc.Key, out _);
@@ -1874,9 +1959,9 @@ namespace SignalForward
                                     }
 
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
-                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:{WaiGuan},{Color},{cc1.Value[9]},{cc1.Value[10]}");
+                                    //Logger?.Info(re);
+                                    //Logger?.Info("----------------------------------------------------");
                                     complete = false;
                                     Aoi2Message.TryRemove(cc1.Key, out _);
                                 }
@@ -1908,9 +1993,9 @@ namespace SignalForward
                                     }
 
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
-                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:");
-                                    Logger?.Info(re);
-                                    Logger?.Info("----------------------------------------------------");
+                                    Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:{WaiGuan},{Color},{WaiGuan},{Color}");
+                                    //Logger?.Info(re);
+                                    //Logger?.Info("----------------------------------------------------");
                                     complete = false;
                                     //Aoi2Message.TryRemove(cc1.Key, out _);
                                 }

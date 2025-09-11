@@ -221,6 +221,15 @@ namespace SignalForward.UDP
         #endregion 释放
     }
 
+
+    public class AsyncUDPState
+    {
+        // Client   socket.
+        public UdpClient udpClient = null;
+
+        public IPEndPoint remote;
+    }
+
     public class WhCurrentQueue<T>
     {
         private ConcurrentQueue<T> _queue = new ConcurrentQueue<T>();
@@ -268,13 +277,5 @@ namespace SignalForward.UDP
             {
             }
         }
-    }
-
-    public class AsyncUDPState
-    {
-        // Client   socket.
-        public UdpClient udpClient = null;
-
-        public IPEndPoint remote;
     }
 }
