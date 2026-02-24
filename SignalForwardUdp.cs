@@ -340,7 +340,15 @@ namespace SignalForward
                                 Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}清除通讯数据缓存");
                             }
                             BeforeTime = CurTime;
-                            var xinhao = dataBytes[66];
+                            int xinhao = 0;
+                            //if (CB.Checked)
+                            //{
+                            //    xinhao = dataBytes[65];
+                            //}
+                            //else if (CP.Checked)
+                            //{
+                            xinhao = dataBytes[66];
+                            //}
                             var shifoupaizhao = dataBytes[3];
                             switch (xinhao)
                             {
@@ -1616,6 +1624,8 @@ namespace SignalForward
                                     re[3] = 0;
                                     re[9] = c.Value[9];
                                     re[10] = c.Value[10];
+                                    re[89] = c.Value[11];
+                                    re[90] = c.Value[90];
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:{c.Value[9]},{c.Value[10]}");
                                     //Logger?.Info(re);
@@ -1706,6 +1716,8 @@ namespace SignalForward
                                     re[3] = 0;
                                     re[11] = c.Value[9];
                                     re[12] = c.Value[10];
+                                    re[89] = c.Value[11];
+                                    re[90] = c.Value[90];
                                     _remoteUdp?.Send(_plcIpEndPoint, re);
                                     Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}发送结果O->PLC:{c.Value[9]},{c.Value[10]}");
                                     //Logger?.Info(re); 
@@ -1859,11 +1871,15 @@ namespace SignalForward
                                         case 1:
                                             re[9] = cc.Value[9];
                                             re[10] = cc.Value[10];
+                                            re[89] = cc.Value[11];
+                                            re[90] = cc.Value[90];
                                             break;
 
                                         case 2:
                                             re[11] = cc1.Value[9];
                                             re[12] = cc1.Value[10];
+                                            re[89] = cc1.Value[11];
+                                            re[90] = cc1.Value[90];
                                             break;
 
                                         case 3:
@@ -1871,6 +1887,18 @@ namespace SignalForward
                                             re[10] = cc.Value[10];
                                             re[11] = cc1.Value[9];
                                             re[12] = cc1.Value[10];
+                                            if (cc.Value[11] == 2 || cc1.Value[11] == 2)
+                                            {
+                                                re[89] = 2;
+                                            }
+                                            if (cc.Value[90] > 0)
+                                            {
+                                                re[90] = cc.Value[90];
+                                            }
+                                            if (cc1.Value[90] > 0)
+                                            {
+                                                re[90] = cc1.Value[90];
+                                            }
                                             break;
                                     }
 
@@ -2123,14 +2151,14 @@ namespace SignalForward
 
                                     if (c.Value[11] == 2)
                                     {
-                                        re[9] = 2;
+                                        re[13] = 2;
                                     }
                                     else
                                     {
-                                        re[9] = 1;
+                                        re[13] = 1;
                                     }
                                     //re[9] = c[9];
-                                    re[12] = c.Value[12];
+                                    re[9] = c.Value[12];
 
                                     var re2 = re.Take(90);
                                     var waferData = c.Value.Skip(90).Take(value.BytesOriginal.Length - 90);
@@ -2227,11 +2255,11 @@ namespace SignalForward
                                     re[3] = 0;
                                     if (c.Value[11] == 2)
                                     {
-                                        re[9] = 2;
+                                        re[13] = 2;
                                     }
                                     else
                                     {
-                                        re[9] = 1;
+                                        re[13] = 1;
                                     }
                                     re[11] = c.Value[12];
 
@@ -2383,15 +2411,15 @@ namespace SignalForward
                                     re[3] = 0;
                                     if (c.Value[11] == 2 || c1.Value[11] == 2)
                                     {
-                                        re[9] = 2;
+                                        re[13] = 2;
                                     }
                                     else
                                     {
-                                        re[9] = 1;
+                                        re[13] = 1;
                                     }
                                     //re[10] = c[10];
-                                    re[11] = c1.Value[12];
-                                    re[12] = c.Value[12];
+                                    re[9] = c1.Value[12];
+                                    re[11] = c.Value[12];
 
                                     var re2 = re.Take(90).ToArray();
                                     var waferData = c.Value.Skip(90).Take(value.BytesOriginal.Length - 90).ToArray();
