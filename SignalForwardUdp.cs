@@ -608,17 +608,18 @@ namespace SignalForward
                     else if ((caozhuo == 1 || caozhuo == 2 || caozhuo == 0) && (liushuihao.SequenceEqual(_moRen1)) || liushuihao.SequenceEqual(_moRen))
                     {
                         //Logger?.Info("AOI流水号为空");
-                        //Logger?.Info(bytes);
+                        Logger?.Info(bytes);
                         Logger?.Info("...");
                     }
                     else if (wuyiyi == 0 && jiuxu == 1 && caozhuo == 0)
                     {
                         Logger?.Info("....");
-                        //Logger?.Info(bytes);
+                        Logger?.Info(bytes);
                     }
                     else
                     {
                         Logger?.Info(".....");
+                        Logger?.Info(bytes);
                         Aoi1Message.TryAdd(bytes, bytes);
                         Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI1消息列表:");
                     }
@@ -785,15 +786,18 @@ namespace SignalForward
                     }
                     else if ((caozhuo == 1 || caozhuo == 2 || caozhuo == 0) && (liushuihao.SequenceEqual(_moRen1)) || liushuihao.SequenceEqual(_moRen))
                     {
+                        Logger?.Info(bytes);
                         Logger?.Info("***");
                     }
                     else if (wuyiyi == 0 && jiuxu == 1 && caozhuo == 0)
                     {
                         Logger?.Info("****");
+                        Logger?.Info(bytes);
                     }
                     else
                     {
                         Logger?.Info("*****");
+                        Logger?.Info(bytes);
                         Aoi2Message.TryAdd(bytes, bytes);
                         Logger?.Info($"{label19.Text}-{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}添加到AOI2消息列表:");
                     }
