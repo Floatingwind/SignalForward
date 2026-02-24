@@ -2185,7 +2185,7 @@ namespace SignalForward
                             break;
 
                         case 2:
-                            var destination2 = value.Bytes1.Skip(34).Take(44 - 34).ToArray();
+                            var destination2 = value.Bytes2.Skip(34).Take(44 - 34).ToArray();
                             timeOut = 0;
                             beforeDt = DateTime.Now;
                             while ((inPhoto || photoCompleted || complete) && timeOut < _timeout)
