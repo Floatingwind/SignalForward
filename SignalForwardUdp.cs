@@ -2155,11 +2155,11 @@ namespace SignalForward
 
                                     if (c.Value[11] == 2)
                                     {
-                                        re[13] = 2;
+                                        re[13] = 1;
                                     }
                                     else
                                     {
-                                        re[13] = 1;
+                                        re[13] = 0;
                                     }
                                     //re[9] = c[9];
                                     re[9] = c.Value[12];
@@ -2259,11 +2259,11 @@ namespace SignalForward
                                     re[3] = 0;
                                     if (c.Value[11] == 2)
                                     {
-                                        re[13] = 2;
+                                        re[13] = 1;
                                     }
                                     else
                                     {
-                                        re[13] = 1;
+                                        re[13] = 0;
                                     }
                                     re[11] = c.Value[12];
 
@@ -2415,11 +2415,11 @@ namespace SignalForward
                                     re[3] = 0;
                                     if (c.Value[11] == 2 || c1.Value[11] == 2)
                                     {
-                                        re[13] = 2;
+                                        re[13] = 1;
                                     }
                                     else
                                     {
-                                        re[13] = 1;
+                                        re[13] = 0;
                                     }
                                     //re[10] = c[10];
                                     re[11] = c1.Value[12];
